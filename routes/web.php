@@ -3,6 +3,7 @@
 use App\Http\Controllers\AlatController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LogAktivitasController;
+use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\user;
 use App\Http\Controllers\userController;
 use Illuminate\Support\Facades\Route;
@@ -17,21 +18,28 @@ Route::post('/login', [userController::class, 'proseslogin'])->name('login.prose
 
 // Route Yang Membutuhkan Session Login (Protected)
 // =======================ADMIN=============================
-Route::middleware(['auth'] == 'admin')->group(function () {
-    Route::get('/admin/alat', [AlatController::class, 'index'])->name('dashboardadmin');
+    Route::middleware(['auth', 'role:admin'])->group(function () {
+        Route::get('/admin/alat', [AlatController::class, 'index'])->name('dashboardadmin');
 
-    Route::get('/admin/user', [userController::class, 'indexUser']);
-    Route::get('/admin/kategori', [KategoriController::class, 'index']);
-    Route::get('/admin/log', [LogAktivitasController::class, 'index']);
-    Route::post('/admin/user/store', [userController::class, 'store']);
-    Route::post('/admin/user/delete/{id}', [userController::class, 'destroy']);
-    Route::put('/admin/user/update/{id}', [userController::class, 'update']);
-    Route::post('/admin/kategori/store', [KategoriController::class, 'store']);
-    Route::post('/admin/kategori/delete/{id}', [KategoriController::class, 'destroy']);
-    Route::put('/admin/kategori/update/{id}', [KategoriController::class, 'update']);
+        Route::get('/admin/user', [userController::class, 'indexUser']);
+        Route::get('/admin/kategori', [KategoriController::class, 'index']);
+        Route::get('/admin/log', [LogAktivitasController::class, 'index']);
+        Route::post('/admin/user/store', [userController::class, 'store']);
+        Route::post('/admin/user/delete/{id}', [userController::class, 'destroy']);
+        Route::put('/admin/user/update/{id}', [userController::class, 'update']);
+        Route::post('/admin/kategori/store', [KategoriController::class, 'store']);
+        Route::post('/admin/kategori/delete/{id}', [KategoriController::class, 'destroy']);
+        Route::put('/admin/kategori/update/{id}', [KategoriController::class, 'update']);
+        Route::post('/admin/alat/store', [AlatController::class, 'store']);
+        Route::post('/admin/alat/delete/{id}', [AlatController::class, 'destroy']);
+        Route::put('/admin/alat/update/{id}', [AlatController::class, 'update']);
+        Route::post('/admin/logout', [userController::class, 'logout'])->name('logout');
+    });
 
+    Route::middleware(['auth', 'role:peminjam'])->group(function () {
+        Route::get('/peminjam/katalog', [AlatController::class, 'indexKatalog'])->name('dp');
+        Route::get('/peminjam/pinjaman', [PeminjamanController::class, 'riwayat']);
+        Route::get('/peminjam/katalog/{id}/create', [PeminjamanController::class, 'create']);
+        Route::post('/peminjam/pinjam/store', [PeminjamanController::class, 'store']);
 
-
-    
-
-});
+    });

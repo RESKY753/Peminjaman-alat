@@ -7,11 +7,19 @@
     <title>Login - PinjamAlat</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Script AlpineJS Ditaruh di Head agar Langsung Aktif -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        [x-cloak] {
+            display: none !important;
         }
     </style>
 </head>
@@ -35,12 +43,12 @@
             <p class="text-slate-400 text-xs mt-1">Sistem Peminjaman Inventaris Alat</p>
         </div>
 
-        <!-- Form Login -->
-        <form action="{{ route('login.proses')}}" method="POST" class="p-8 space-y-5">
+        <!-- Form Login (Deklarasi x-data di sini agar mencakup seluruh input) -->
+        <form action="{{ route('login.proses') }}" method="POST" x-data="{ showPassword: false }" class="p-8 space-y-5">
             @csrf
 
             <!-- Pesan Error / Alert Global -->
-            @if(session('error'))
+            @if (session('error'))
                 <div
                     class="p-3 bg-rose-50 border border-rose-200 text-rose-600 rounded-lg text-xs font-semibold flex items-center space-x-2">
                     <i class="fa-solid fa-circle-exclamation"></i>
@@ -67,18 +75,20 @@
             <!-- Input Password -->
             <div>
                 <label for="password" class="block text-xs font-semibold text-slate-700 mb-1.5">Password</label>
-                <div class="relative" x-data="{ show: false }">
+                <div class="relative">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                         <i class="fa-solid fa-lock text-xs"></i>
                     </span>
-                    <input :type="show ? 'text' : 'password'" id="password" name="password" required
+
+                    <!-- Buka / Tutup Intip Password memakai showPassword -->
+                    <input :type="showPassword ? 'text' : 'password'" id="password" name="password" required
                         placeholder="••••••••"
                         class="w-full pl-9 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
 
                     <!-- Toggle Show/Hide Password -->
-                    <button type="button" @click="show = !show"
-                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
-                        <i class="fa-solid" :class="show ? 'fa-eye-slash' : 'fa-eye'"></i>
+                    <button type="button" @click="showPassword = !showPassword"
+                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none">
+                        <i class="fa-solid" :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
                     </button>
                 </div>
                 @error('password')
@@ -86,7 +96,7 @@
                 @enderror
             </div>
 
-            <!-- Remember Me & Forgot Password -->
+            <!-- Remember Me -->
             <div class="flex items-center justify-between text-xs">
                 <label class="flex items-center space-x-2 cursor-pointer">
                     <input type="checkbox" name="remember"
@@ -112,8 +122,6 @@
 
     </div>
 
-    <!-- Script AlpineJS untuk Toggle Intip Password -->
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </body>
 
 </html>

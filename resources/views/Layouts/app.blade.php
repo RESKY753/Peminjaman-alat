@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/alert.css') }}">
+    <script src="{{ asset('js/alert.js') }}"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
@@ -26,11 +28,12 @@
     <!-- Panggil Layout Sidebar & Konten Utama -->
     @include('Layouts.sidebar')
 
-    <!-- STRUKTUR HTML MODAL ALERT (WAJIB ADA BIAR JS BISA BACA ELEMEN) -->
+    <!-- STRUKTUR HTML MODAL ALERT DENGAN DUKUNGAN SUCCESS & DANGER -->
     <div id="customAlertOverlay" class="custom-alert-overlay">
         <div class="custom-alert-box">
+            <!-- Ikon Dinamis -->
             <div id="customAlertIcon" class="custom-alert-icon danger">
-                <i class="fa-solid fa-triangle-exclamation"></i>
+                <i id="customAlertIconTag" class="fa-solid fa-triangle-exclamation"></i>
             </div>
             <h3 id="customAlertTitle" class="custom-alert-title">Judul Alert</h3>
             <p id="customAlertMessage" class="custom-alert-message">Pesan penjelasan alert disini...</p>
@@ -42,15 +45,18 @@
             </div>
         </div>
     </div>
-
     <!-- Script JS Custom Alert -->
-    <script src="{{ asset('js/alert.js') }}"></script>
 
+    
     <!-- Auto Trigger Notifikasi dari Session Controller -->
     @if (session('success'))
         <script>
             document.addEventListener("DOMContentLoaded", function() {
-                showAlertSuccess('Berhasil!', "{{ session('success') }}");
+                if (typeof window.showAlertSuccess === 'function') {
+                    window.showAlertSuccess('Berhasil!', "{{ session('success') }}");
+                } else {
+                    console.error('Fungsi showAlertSuccess belum dimuat. Cek file public/js/alert.js!');
+                }
             });
         </script>
     @endif
@@ -58,7 +64,9 @@
     @if (session('error'))
         <script>
             document.addEventListener("DOMContentLoaded", function() {
-                showAlertConfirm('Gagal!', "{{ session('error') }}");
+                if (typeof window.showAlertConfirm === 'function') {
+                    window.showAlertConfirm('Gagal!', "{{ session('error') }}");
+                }
             });
         </script>
     @endif

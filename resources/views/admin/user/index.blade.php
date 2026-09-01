@@ -14,6 +14,17 @@
         }">
 
             <!-- Header Page & Tombol Tambah -->
+            @if (session('success'))
+                <div
+                    class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm p-4 rounded-xl flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i>
+                        <span>{{ session('success') }}</span>
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="text-emerald-400 hover:text-emerald-200"><i
+                            class="fas fa-times"></i></button>
+                </div>
+            @endif
             <div
                 class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
@@ -38,18 +49,6 @@
                     <span>Tambah User</span>
                 </button>
             </div>
-
-            {{-- @if (session('success'))
-                <div
-                    class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm p-4 rounded-xl flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <i class="fas fa-check-circle"></i>
-                        <span>{{ session('success') }}</span>
-                    </div>
-                    <button onclick="this.parentElement.remove()" class="text-emerald-400 hover:text-emerald-200"><i
-                            class="fas fa-times"></i></button>
-                </div>
-            @endif --}}
 
             <!-- Tabel Data User (Read) -->
             <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
@@ -159,7 +158,8 @@
                                             </button>
                                             <!-- Form Hapus -->
                                             <form id="delete-form-{{ $item->id_user }}"
-                                                action="/admin/user/delete/{{ $item->id_user }}" method="POST" class="inline">
+                                                action="/admin/user/delete/{{ $item->id_user }}" method="POST"
+                                                class="inline">
                                                 @csrf
                                                 @method('POST')
                                                 <button type="button"

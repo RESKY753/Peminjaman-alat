@@ -4,6 +4,17 @@
     <div class="space-y-6" x-data="{ openModal: false, editMode: false, namaKategori: '', keterangan: '' }">
 
         <!-- Header Page & Tombol Tambah -->
+        @if (session('success'))
+            <div
+                class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm p-4 rounded-xl flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-check-circle"></i>
+                    <span>{{ session('success') }}</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-emerald-400 hover:text-emerald-200"><i
+                        class="fas fa-times"></i></button>
+            </div>
+        @endif
         <div
             class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
@@ -50,7 +61,8 @@
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </button>
                                         <form id="delete-form-{{ $kat->id_kategori }}"
-                                            action="/admin/kategori/delete/{{ $kat->id_kategori }}" method="POST" class="inline">
+                                            action="/admin/kategori/delete/{{ $kat->id_kategori }}" method="POST"
+                                            class="inline">
                                             @csrf
                                             @method('POST')
                                             <button type="button"
@@ -103,9 +115,9 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Kategori</label>
                         <input type="text" name="nama_kategori" x-model="namaKategori" required
-                            placeholder="Contoh: Elektronik, Perkakas..." 
+                            placeholder="Contoh: Elektronik, Perkakas..."
                             class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            {{-- @error('nama_kategori')
+                        {{-- @error('nama_kategori')
                                 <div class="text-danger small mt-1 fw-bold">{{ $message }}</div>
                             @enderror --}}
                     </div>
@@ -116,7 +128,7 @@
                         <textarea rows="3" name="keterangan" x-model="keterangan" required
                             placeholder="Penjelasan singkat mengenai kategori ini..."
                             class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-                            {{-- @error('keterangan')
+                        {{-- @error('keterangan')
                                 <div class="text-danger small mt-1 fw-bold">{{ $message }}</div>
                             @enderror --}}
                     </div>

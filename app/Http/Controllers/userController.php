@@ -43,8 +43,9 @@ class userController extends Controller
 
             if ($role === 'admin') {
                 return redirect()->route('dashboardadmin');
+            }elseif ($role === 'peminjam') {
+                return redirect()->route('dp');
             }
-
             return redirect()->to('/');
         }
 
@@ -86,20 +87,19 @@ class userController extends Controller
             'updated_at' => now(),
         ]);
 
-        $user = ([
+        $user = [
             'username' => $request->username,
             'email' => $request->email,
             'telp' => $request->telp,
             'role' => $request->role,
             'updated_at' => $request->updated_at,
-        ]);
+        ];
 
         if ($request->filled('password')) {
             $user['password'] = Hash::make($request->password);
         }
-        User::find($id)
-        ->update($user);
-        return redirect()->back()->with('success','User berhasil diubah');
+        User::find($id)->update($user);
+        return redirect()->back()->with('success', 'User berhasil diubah');
     }
 
     function destroy(Request $request, $id)
@@ -108,5 +108,20 @@ class userController extends Controller
         $user->delete();
 
         return redirect()->back()->with('success', 'User berhasil dihapus');
+    }
+
+    function logout(Request $request)
+    {
+        // 1. Logout dari guard admin
+        Auth::logout();
+
+        // 2. Hapus semua data session biar bersih
+        $request->session()->invalidate();
+
+        // 3. Bikin token session baru buat keamanan (mencegah CSRF attack)
+        $request->session()->regenerateToken();
+
+        // 4. Lempar balik ke halaman login
+        return redirect('/')->with('success', 'Berhasil keluar, sampai jumpa lagi!');
     }
 }

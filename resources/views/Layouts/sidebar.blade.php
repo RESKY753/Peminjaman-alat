@@ -30,7 +30,7 @@
             </div>
 
             <!-- Menu Navigasi -->
-            <nav class="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-8rem)]">
+            <nav class="sticky top-0 p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-8rem)]">
 
                 {{-- Dashboard Utama (Berlaku Semua Role) --}}
                 <a href="{{ url('/dashboard') }}"
@@ -85,7 +85,7 @@
                         <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Menu Peminjam
                         </p>
                         <a href="{{ url('/peminjam/katalog') }}"
-                            class="flex items-center px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg transition text-sm font-medium">
+                            class="flex items-center px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg transition text-sm font-medium ">
                             <i class="fa-solid fa-layer-group w-6 text-slate-500"></i> Katalog Alat
                         </a>
                         <a href="{{ url('/peminjam/pinjaman') }}"
@@ -101,7 +101,7 @@
         <div class="p-4 border-t border-slate-800 flex items-center justify-between bg-slate-900/50">
             <div class="flex items-center space-x-3">
                 @php
-                    $initial = strtoupper(substr(auth()->user()->username ?? 'U', 0, 1));
+$initial = strtoupper(substr(auth()->user()->username ?? 'U', 0, 1));
                 @endphp
                 <div
                     class="w-9 h-9 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs shadow-sm">
@@ -114,7 +114,7 @@
                 </div>
             </div>
 
-            <form action="{{-- route('logout') --}}" method="POST">
+            <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button type="submit"
                     class="text-slate-400 hover:text-rose-400 p-2 rounded-lg hover:bg-slate-800 transition"
