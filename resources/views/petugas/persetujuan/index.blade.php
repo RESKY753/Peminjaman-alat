@@ -19,25 +19,27 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                    <tr class="hover:bg-slate-50">
-                        <td class="px-6 py-4 font-bold text-slate-800">Siswa Ahmad</td>
-                        <td class="px-6 py-4">Kamera Canon EOS 600D</td>
-                        <td class="px-6 py-4 text-slate-500">27 Ags 2026, 09:00 WIB</td>
-                        <td class="px-6 py-4">
-                            <span
-                                class="px-2.5 py-1 bg-amber-50 text-amber-600 rounded-md text-xs font-semibold">Pending</span>
-                        </td>
-                        <td class="px-6 py-4 text-center space-x-2">
-                            <button
-                                class="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 transition">
-                                <i class="fa-solid fa-check mr-1"></i> Setujui
-                            </button>
-                            <button
-                                class="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-semibold hover:bg-rose-700 transition">
-                                <i class="fa-solid fa-xmark mr-1"></i> Tolak
-                            </button>
-                        </td>
-                    </tr>
+                    @foreach ($persetujuan as $item)
+                        <tr class="hover:bg-slate-50">
+                            <td class="px-6 py-4 font-bold text-slate-800">{{ $item->username }}</td>
+                            <td class="px-6 py-4">{{ $item->nama_alat }}</td>
+                            <td class="px-6 py-4 text-slate-500">{{ $item->tanggal_pinjam }}</td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="px-2.5 py-1 bg-amber-50 text-amber-600 rounded-md text-xs font-semibold">{{ $item->status }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-center space-x-2">
+                                <button
+                                    class="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 transition">
+                                    <i class="fa-solid fa-check mr-1"></i> Setujui
+                                </button>
+                                <button
+                                    class="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-semibold hover:bg-rose-700 transition">
+                                    <i class="fa-solid fa-xmark mr-1"></i> Tolak
+                                </button>
+                            </td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>

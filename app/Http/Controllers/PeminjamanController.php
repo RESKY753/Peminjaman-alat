@@ -21,7 +21,16 @@ class PeminjamanController extends Controller
     }
 
     function indexPersetujuan(){
-        return view('petugas.persetujuan.index');
+        $persetujuan = DB::table('peminjaman')
+        ->join('users', 'peminjaman.id_user', '=', 'users.id_user')
+        ->join('alat', 'peminjaman.id_alat', '=', 'alat.id_alat')
+        ->select(
+            'users.username', 
+            'alat.nama_alat', 
+            'peminjaman.tanggal_pinjam', 
+            'peminjaman.status' 
+        )->get();
+        return view('petugas.persetujuan.index', compact('persetujuan'));
     }
     public function riwayat()
     {
