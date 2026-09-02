@@ -12,34 +12,50 @@ class AlatController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $alat = Alat::join('kategori', 'alat.id_kategori', '=', 'kategori.id_kategori')->get();
-        $kategori = Kategori::all();
+        $query = Alat::with('kategori');
 
-        return view('admin.alat.index', compact('alat', 'kategori'));
+        // Filter Pencarian Nama Alat
+        if ($request->filled('search')) {
+            $query->where('nama_alat', 'like', '%' . $request->search . '%');
+        }
+
+        // Paginasi 15 data per halaman
+        $alat = $query->latest('id_alat')->paginate(15)->withQueryString();
+
+        return view('admin.alat.index', compact('alat'));
     }
-
     /**
      * Show the form for creating a new resource.
      */
 
-    public function indexKatalog()
+    public function indexKatalog(Request $request)
     {
-        // Mengambil SEMUA alat, urutkan stok > 0 dulu di atas, stok 0 di paling bawah
-        $alat = Alat::with('kategori')
-            ->orderByRaw('stok = 0 ASC') // Stok 0 akan ditaruh di urutan paling akhir
-            ->orderBy('nama_alat', 'ASC') // Urutkan nama alat A-Z (opsional agar rapi)
-            ->get();
+        $kategori = Kategori::all();
 
-        $stok = $alat->count();
+        $query = Alat::with('kategori');
 
-        return view('peminjam.katalog.index', compact('alat', 'stok'));
+        // Filter Kategori
+        if ($request->filled('kategori')) {
+            $query->where('id_kategori', $request->kategori);
+        }
+
+        // Filter Pencarian Nama Alat
+        if ($request->filled('search')) {
+            $query->where('nama_alat', 'like', '%' . $request->search . '%');
+        }
+
+        // Urutkan stok > 0 di atas, stok 0 di paling bawah
+        $alat = $query->orderByRaw('stok = 0 ASC')->orderBy('id_alat', 'DESC')->paginate(12)->withQueryString();
+
+        return view('peminjam.katalog.index', compact('alat', 'kategori'));
     }
 
     public function create()
     {
-        //
+        $kategori = Kategori::all();
+        return view('admin.alat.create', compact('kategori'));
     }
 
     /**
@@ -79,7 +95,7 @@ class AlatController extends Controller
             'foto' => $namaFoto, // Simpan hanya nama filenya saja
         ]);
 
-        return redirect()->back()->with('success', 'Alat berhasil ditambahkan');
+        return redirect('/admin/alat')->with('success', 'Alat berhasil ditambahkan');
     }
 
     /**
@@ -93,9 +109,11 @@ class AlatController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Alat $alat)
+    public function edit($id)
     {
-        //
+        $kategori = Kategori::all();
+        $alat = Alat::findOrFail($id);
+        return view('admin.alat.edit', compact('alat', 'kategori'));
     }
 
     /**
@@ -144,7 +162,7 @@ class AlatController extends Controller
             'foto' => $namaFoto,
         ]);
 
-        return redirect()->back()->with('success', 'Alat berhasil diubah');
+        return redirect('admin/alat')->with('success', 'Alat berhasil diubah');
     }
 
     /**

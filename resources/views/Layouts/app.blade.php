@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/alert.css') }}">
-    <script src="{{ asset('js/alert.js') }}"></script>
+    {{-- <script src="{{ asset('js/alert.js') }}"></script> --}}
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
@@ -27,29 +27,12 @@
 
     <!-- Panggil Layout Sidebar & Konten Utama -->
     @include('Layouts.sidebar')
-
-    <!-- STRUKTUR HTML MODAL ALERT DENGAN DUKUNGAN SUCCESS & DANGER -->
-    <div id="customAlertOverlay" class="custom-alert-overlay">
-        <div class="custom-alert-box">
-            <!-- Ikon Dinamis -->
-            <div id="customAlertIcon" class="custom-alert-icon danger">
-                <i id="customAlertIconTag" class="fa-solid fa-triangle-exclamation"></i>
-            </div>
-            <h3 id="customAlertTitle" class="custom-alert-title">Judul Alert</h3>
-            <p id="customAlertMessage" class="custom-alert-message">Pesan penjelasan alert disini...</p>
-
-            <div class="custom-alert-buttons">
-                <button type="button" id="customAlertBtnCancel" class="custom-alert-btn cancel">Batal</button>
-                <button type="button" id="customAlertBtnConfirm" class="custom-alert-btn confirm-danger">Ya,
-                    Yakin</button>
-            </div>
-        </div>
-    </div>
+    
     <!-- Script JS Custom Alert -->
 
     
     <!-- Auto Trigger Notifikasi dari Session Controller -->
-    @if (session('success'))
+    {{-- @if (session('success'))
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 if (typeof window.showAlertSuccess === 'function') {
@@ -69,7 +52,7 @@
                 }
             });
         </script>
-    @endif
+    @endif --}}
 
 </body>
 

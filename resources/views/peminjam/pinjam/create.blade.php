@@ -45,11 +45,28 @@
                     @endif
                 </div>
             </div>
+            <!-- Menampilkan pesan error stok (Session Alert) -->
+            @if (session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+            @endif
 
+            <!-- Menampilkan pesan error dari Validasi Input -->
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             <!-- Form Pengajuan -->
             <form action="{{ url('/peminjam/pinjam/store') }}" method="POST" class="space-y-4">
                 @csrf
                 <input type="hidden" name="id_alat" value="{{ $alat->id_alat }}">
+                <input type="hidden" name="tanggal_pinjam" value="{{ now()->toDateString() }}">
 
                 <!-- Input Jumlah Pinjam -->
                 <div>
