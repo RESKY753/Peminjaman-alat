@@ -45,8 +45,12 @@ Route::middleware(['auth', 'role:peminjam'])->group(function () {
     Route::get('/peminjam/pinjaman/{id}', [PeminjamanController::class, 'pinjamanSaya']);
     Route::get('/peminjam/katalog/{id}/create', [PeminjamanController::class, 'create']);
     Route::post('/peminjam/pinjam/store', [PeminjamanController::class, 'store']);
+    Route::put('/peminjam/pinjaman/update/{id}', [PeminjamanController::class, 'updatePeminjaman']);
 });
 
 Route::middleware(['auth', 'role:petugas'])->group(function () {
      Route::get('/petugas/persetujuan', [PeminjamanController::class, 'indexPersetujuan'])->name('dpetugas');
+     Route::put('/petugas/persetujuan/update/{id}', [PeminjamanController::class, 'updatePersetujuan']);
+     Route::get('/petugas/laporan', [PeminjamanController::class,'laporan']);
+     Route::get('/petugas/daftar', [PeminjamanController::class,'indexDaftarPeminjam']);
 });

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nama_kategori');
             $table->string('keterangan');
             $table->timestamps();
+            $table->timestamp('status_kategori')->nullable();
         });
     }
 

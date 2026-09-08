@@ -16,6 +16,18 @@
                 </button>
             </div>
         @endif
+        @if (session('error'))
+            <div
+                class="bg-rose-500/10 border border-rose-500/30 text-rose-400 text-sm p-4 rounded-xl flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>{{ session('error') }}</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-rose-400 hover:text-rose-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        @endif
 
         <!-- Header Page & Tombol Ke Halaman Tambah -->
         <div

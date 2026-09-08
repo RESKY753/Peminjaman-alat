@@ -1,6 +1,18 @@
 @extends('Layouts.app')
 
 @section('content')
+    @if (session('success'))
+        <div
+            class="my-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm p-4 rounded-xl flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-check-circle"></i>
+                <span>{{ session('success') }}</span>
+            </div>
+            <button onclick="this.parentElement.remove()" class="text-emerald-400 hover:text-emerald-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    @endif
     <div class="space-y-6">
         <!-- Header Page -->
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
@@ -23,7 +35,8 @@
                     $namaAlat = $alat->nama_alat ?? ($item->nama_alat ?? '-');
                     $fotoAlat = $alat->foto ?? ($item->foto ?? null);
                     $kondisiAlat = strtolower($alat->kondisi ?? ($item->kondisi ?? 'baik'));
-                    $status = strtolower($item->status ?? 'pending');
+                    $status = strtolower($item->status ?? 'ajukan peminjaman');
+                    $idPeminjaman = $item->id_peminjaman ?? $item->id;
                 @endphp
 
                 <!-- Card Item Pinjaman -->
@@ -47,41 +60,46 @@
                                     <h3 class="font-bold text-slate-800 text-sm line-clamp-1" title="{{ $namaAlat }}">
                                         {{ $namaAlat }}
                                     </h3>
-                                    <span class="text-[11px] text-slate-400">ID Pinjam:
-                                        #PJ-0{{ $item->id_peminjaman ?? $item->id }}</span>
+                                    <span class="text-[11px] text-slate-400">ID Pinjam: #PJ-0{{ $idPeminjaman }}</span>
                                 </div>
                             </div>
 
                             <!-- SWITCH CASE: BADGE STATUS -->
                             @switch($status)
-                                @case('disetujui')
-                                @case('dipinjam')
-                                    <span
-                                        class="px-2.5 py-1 rounded-md text-[11px] font-bold border uppercase tracking-wider bg-emerald-50 text-emerald-600 border-emerald-100 shrink-0">
-                                        {{ str_replace('_', ' ', $item->status) }}
-                                    </span>
-                                @break
-
-                                @case('pending')
-                                @case('menunggu')
+                                @case('ajukan peminjaman')
                                     <span
                                         class="px-2.5 py-1 rounded-md text-[11px] font-bold border uppercase tracking-wider bg-amber-50 text-amber-600 border-amber-100 shrink-0">
-                                        {{ str_replace('_', ' ', $item->status) }}
+                                        Ajukan Peminjaman
                                     </span>
                                 @break
 
-                                @case('ditolak')
+                                @case('dipinjam')
                                     <span
-                                        class="px-2.5 py-1 rounded-md text-[11px] font-bold border uppercase tracking-wider bg-rose-50 text-rose-600 border-rose-100 shrink-0">
-                                        {{ str_replace('_', ' ', $item->status) }}
+                                        class="px-2.5 py-1 rounded-md text-[11px] font-bold border uppercase tracking-wider bg-indigo-50 text-indigo-600 border-indigo-100 shrink-0">
+                                        Dipinjam
+                                    </span>
+                                @break
+
+                                @case('ajukan kembali')
+                                @case('ajukan pengembalian')
+                                    <span
+                                        class="px-2.5 py-1 rounded-md text-[11px] font-bold border uppercase tracking-wider bg-sky-50 text-sky-600 border-sky-100 shrink-0">
+                                        Pengembalian
                                     </span>
                                 @break
 
                                 @case('dikembalikan')
                                 @case('selesai')
                                     <span
-                                        class="px-2.5 py-1 rounded-md text-[11px] font-bold border uppercase tracking-wider bg-indigo-50 text-indigo-600 border-indigo-100 shrink-0">
-                                        {{ str_replace('_', ' ', $item->status) }}
+                                        class="px-2.5 py-1 rounded-md text-[11px] font-bold border uppercase tracking-wider bg-emerald-50 text-emerald-600 border-emerald-100 shrink-0">
+                                        Dikembalikan
+                                    </span>
+                                @break
+
+                                @case('ditolak')
+                                    <span
+                                        class="px-2.5 py-1 rounded-md text-[11px] font-bold border uppercase tracking-wider bg-rose-50 text-rose-600 border-rose-100 shrink-0">
+                                        Ditolak
                                     </span>
                                 @break
 
@@ -156,16 +174,25 @@
                     <!-- SWITCH CASE: TOMBOL AKSI -->
                     <div>
                         @switch($status)
-                            @case('disetujui')
+                            {{-- Jika status DIPINJAM: Munculkan tombol aktif untuk Mengajukan Pengembalian --}}
                             @case('dipinjam')
-                              <button disabled
-                                    class="w-full py-2 bg-slate-100 text-slate-400 rounded-lg text-xs font-semibold cursor-not-allowed flex items-center justify-center space-x-1.5">
-                                    <i class="fa-solid fa-circle-check"></i>
-                                    <span>dipinjam</span>
-                                </button>
+                                <form action="{{ url('/peminjam/pinjaman/update/' . $idPeminjaman) }}" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="status" value="ajukan kembali">
+                                    <button type="submit" onclick="return confirm('Ajukan pengembalian untuk alat ini?')"
+                                        class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-1.5 shadow-sm">
+                                        <i class="fa-solid fa-rotate-left"></i>
+                                        <span>Kembalikan Alat Ini</span>
+                                    </button>
+                                </form>
                             @break
-                            @case('pending')
-                            @case('menunggu')
+
+                            {{-- Jika status AJUKAN PEMINJAMAN / AJUKAN PENGEMBALIAN: Tampilkan Menunggu Persetujuan --}}
+                            @case('ajukan peminjaman')
+                            @case('ajukan kembali')
+
+                            @case('ajukan pengembalian')
                                 <button disabled
                                     class="w-full py-2 bg-slate-100 text-amber-600 rounded-lg text-xs font-semibold cursor-not-allowed border border-amber-200 flex items-center justify-center space-x-1.5">
                                     <i class="fa-solid fa-clock"></i>
@@ -173,9 +200,20 @@
                                 </button>
                             @break
 
+                            {{-- Jika status DITOLAK --}}
+                            @case('ditolak')
+                                <button disabled
+                                    class="w-full py-2 bg-rose-50 text-rose-500 rounded-lg text-xs font-semibold cursor-not-allowed border border-rose-200 flex items-center justify-center space-x-1.5">
+                                    <i class="fa-solid fa-xmark"></i>
+                                    <span>Peminjaman Ditolak</span>
+                                </button>
+                            @break
+
+                            {{-- Jika status DIKEMBALIKAN / SELESAI --}}
+
                             @default
                                 <button disabled
-                                    class="w-full py-2 bg-slate-100 text-slate-400 rounded-lg text-xs font-semibold cursor-not-allowed flex items-center justify-center space-x-1.5">
+                                    class="w-full py-2 bg-emerald-50 text-emerald-500 border border-emerald-200/60 rounded-lg text-xs font-semibold cursor-not-allowed flex items-center justify-center space-x-1.5 opacity-80">
                                     <i class="fa-solid fa-circle-check"></i>
                                     <span>Peminjaman Selesai</span>
                                 </button>

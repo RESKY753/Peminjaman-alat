@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\HistoriPinjaman;
+use App\Models\LogAktivitas;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Database\QueryException; // WAJIB DI-IMPORT UNTUK TANGKAP ERROR RESTRICT
 
 class userController extends Controller
 {
@@ -39,8 +42,14 @@ class userController extends Controller
             // KODE KUNCI: Regenerasi session agar tersimpan resmi di server
             $request->session()->regenerate();
 
+            $user = Auth::user();
+
+            // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+            LogAktivitas::catat('Login', 'User ' . $user->username . ' berhasil login', $user->id_user);
+
             // Direct berdasarkan role
             $role = Auth::user()->role;
+            
 
             if ($role === 'admin') {
                 return redirect()->route('dashboardadmin');
@@ -64,12 +73,22 @@ class userController extends Controller
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('username', 'like', '%' . $request->search . '%')->orWhere('email', 'like', '%' . $request->search . '%');
+
+                $user = Auth::user();
+
+                // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+                LogAktivitas::catat('Mencari nama pengguna', 'User ' . $user->username . ' berhasil mencari nama pengguna', $user->id_user);
             });
         }
 
         // 2. Filter Berdasarkan Role
         if ($request->filled('role')) {
             $query->where('role', $request->role);
+
+            $user = Auth::user();
+
+            // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+            LogAktivitas::catat('Mencari pengguna berdasrkan role', 'User ' . $user->username . ' berhasil mencari role', $user->id_user);
         }
 
         // 3. Batasi 15 Data Per Halaman & Simpan Query Parameter saat Pindah Halaman
@@ -90,7 +109,7 @@ class userController extends Controller
                 'username' => 'required',
                 'email' => ['required', 'email', Rule::unique('users', 'email')],
                 'telp' => 'required',
-                'password' => 'nullable|min:6',
+                'password' => 'nullable|min:6|required',
                 'role' => 'required',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -102,11 +121,18 @@ class userController extends Controller
                 'email.email' => 'Format email tidak valid!',
                 'telp.required' => 'Nomor telepon wajib diisi!',
                 'password.min' => 'Password minimal harus 6 karakter!',
+                'password.required' => 'Password harus diisi!',
                 'role.required' => 'Role / Hak akses wajib dipilih!',
             ],
         );
 
         User::create($validated);
+
+        $user = Auth::user();
+
+        // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+        LogAktivitas::catat('Menambahkan user', 'User ' . $user->username . ' Menambahkan User', $user->id_user);
+
         return redirect('admin/user')->with('success', 'User berhasil diitambahkan');
     }
 
@@ -151,19 +177,49 @@ class userController extends Controller
             $user['password'] = Hash::make($request->password);
         }
         User::find($id)->update($user);
+
+        $user = Auth::user();
+
+        // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+        LogAktivitas::catat('Mengubah data user', 'User ' . $user->username . ' Mengubah data user', $user->id_user);
+
         return redirect('/admin/user')->with('success', 'User berhasil diubah');
     }
 
-    function destroy(Request $request, $id)
+    public function destroy($id)
     {
-        $user = User::find($id);
-        $user->delete();
+        try {
+            // 1. Cari user yang mau dihapus & simpan namanya sebelum hilang
+            $targetUser = User::findOrFail($id);
+            $namaTarget = $targetUser->username;
 
-        return redirect()->back()->with('success', 'User berhasil dihapus');
+            // 2. Eksekusi hapus user
+            $targetUser->delete();
+
+            // 3. Ambil data admin yang sedang login
+            $admin = Auth::user();
+
+            // 4. Catat ke log aktivitas (Hanya jalan kalau hapus BERHASIL)
+            LogAktivitas::catat('Menghapus User', 'Admin ' . $admin->username . ' menghapus user ' . $namaTarget, $admin->id_user);
+
+            return redirect()->back()->with('success', 'User berhasil dihapus.');
+        } catch (QueryException $e) {
+            // 5. TANGKAP ERROR RESTRICT DI SINI (SQLSTATE 23000)
+            if ($e->getCode() == '23000') {
+                return redirect()->back()->with('error', 'User tidak bisa dihapus karena masih memiliki riwayat transaksi atau log aktivitas!');
+            }
+
+            // Kalau ada error database lainnya
+            return redirect()->back()->with('error', 'Gagal menghapus user dari database.');
+        }
     }
 
     function logout(Request $request)
     {
+        $user = Auth::user();
+
+        // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+        LogAktivitas::catat('Logout', $user->username . ' logout', $user->id_user);
         // 1. Logout dari guard admin
         Auth::logout();
 

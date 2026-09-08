@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kategori;
+use App\Models\LogAktivitas;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class KategoriController extends Controller
 {
@@ -14,7 +16,7 @@ class KategoriController extends Controller
     public function index()
     {
         $kategori = Kategori::all();
-        return view('admin.kategori.index' , compact('kategori'));
+        return view('admin.kategori.index', compact('kategori'));
     }
 
     /**
@@ -30,15 +32,23 @@ class KategoriController extends Controller
      */
     public function store(Request $request)
     {
-       $kategori = $request->validate([
-           'nama_kategori' => 'required',
-           'keterangan' => 'required'
-        ],[
-            'nama_keterangan.required' => 'nama wajib diisi!',
-            'keterangan.required' => 'keterangan wajib diisi!'
-        ]);
+        $kategori = $request->validate(
+            [
+                'nama_kategori' => 'required',
+                'keterangan' => 'required',
+            ],
+            [
+                'nama_keterangan.required' => 'nama wajib diisi!',
+                'keterangan.required' => 'keterangan wajib diisi!',
+            ],
+        );
 
         Kategori::create($kategori);
+
+        $user = Auth::user();
+
+        // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+        LogAktivitas::catat('Menambahkan kategori', $user->username . ' ,Menambahkan kategori', $user->id_user);
         return redirect()->back()->with('success', 'Data berhasil ditambahkan');
     }
 
@@ -65,12 +75,17 @@ class KategoriController extends Controller
     {
         $kategori = $request->validate([
             'nama_kategori' => 'required',
-            'keterangan' => 'required'
+            'keterangan' => 'required',
         ]);
 
         Kategori::find($id)->update($kategori);
 
-        return redirect()->back()->with('success','Kategori berhasil diubah');
+        $user = Auth::user();
+
+        // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+        LogAktivitas::catat('Mengubah kategori', $user->username . ' ,Mengubah kategori', $user->id_user);
+
+        return redirect()->back()->with('success', 'Kategori berhasil diubah');
     }
 
     /**
@@ -78,9 +93,13 @@ class KategoriController extends Controller
      */
     public function destroy(Kategori $kategori, $id)
     {
-        Kategori::find($id)
-        ->delete();
+        Kategori::find($id)->delete();
 
-        return redirect()->back()->with('success','Kategori berhasil dihapus');
+        $user = Auth::user();
+
+        // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+        LogAktivitas::catat('Menghapus kategori', $user->username . ' ,Menghapus kategori', $user->id_user);
+
+        return redirect()->back()->with('success', 'Kategori berhasil dihapus');
     }
 }

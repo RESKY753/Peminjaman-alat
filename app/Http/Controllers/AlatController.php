@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Alat;
 use App\Models\Kategori;
+use App\Models\LogAktivitas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 
 class AlatController extends Controller
@@ -19,6 +21,11 @@ class AlatController extends Controller
         // Filter Pencarian Nama Alat
         if ($request->filled('search')) {
             $query->where('nama_alat', 'like', '%' . $request->search . '%');
+
+            $user = Auth::user();
+
+            // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+            LogAktivitas::catat('Mencari nama alat', $user->username . ' ,Mencari nama alat', $user->id_user);
         }
 
         // Paginasi 15 data per halaman
@@ -39,11 +46,21 @@ class AlatController extends Controller
         // Filter Kategori
         if ($request->filled('kategori')) {
             $query->where('id_kategori', $request->kategori);
+
+            $user = Auth::user();
+
+            // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+            LogAktivitas::catat('Mencari alat berdasarkan kategori', $user->username . ' ,Mencari alat bersarkan kategori', $user->id_user);
         }
 
         // Filter Pencarian Nama Alat
         if ($request->filled('search')) {
             $query->where('nama_alat', 'like', '%' . $request->search . '%');
+
+            $user = Auth::user();
+
+            // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+            LogAktivitas::catat('Mencari alat berdasarkan nama', $user->username . ' ,Mencari alat berdasarkan nama', $user->id_user);
         }
 
         // Urutkan stok > 0 di atas, stok 0 di paling bawah
@@ -94,6 +111,11 @@ class AlatController extends Controller
             'spesifikasi' => $request->spesifikasi,
             'foto' => $namaFoto, // Simpan hanya nama filenya saja
         ]);
+
+        $user = Auth::user();
+
+        // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+        LogAktivitas::catat('Menambahkan Alat', $user->username . ' ,Menambahkan Alat', $user->id_user);
 
         return redirect('/admin/alat')->with('success', 'Alat berhasil ditambahkan');
     }
@@ -162,6 +184,11 @@ class AlatController extends Controller
             'foto' => $namaFoto,
         ]);
 
+        $user = Auth::user();
+
+        // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+        LogAktivitas::catat('Mengubah alat', $user->username . ' ,Mengubah alat', $user->id_user);
+
         return redirect('admin/alat')->with('success', 'Alat berhasil diubah');
     }
 
@@ -171,7 +198,10 @@ class AlatController extends Controller
     public function destroy(Alat $alat, $id)
     {
         Alat::find($id)->delete();
+        $user = Auth::user();
 
+        // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+        LogAktivitas::catat('Menghapus alat', $user->username . ' ,Menghapus alat', $user->id_user);
         return redirect()->back()->with('success', 'Alat berhasil dihapus');
     }
 }

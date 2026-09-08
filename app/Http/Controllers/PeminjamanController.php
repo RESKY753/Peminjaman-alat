@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Alat;
+use App\Models\LogAktivitas;
 use App\Models\Peminjaman;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,17 +21,60 @@ class PeminjamanController extends Controller
         return view('peminjam.katalog.index');
     }
 
-    function indexPersetujuan(){
+    function indexPersetujuan()
+    {
         $persetujuan = DB::table('peminjaman')
-        ->join('users', 'peminjaman.id_user', '=', 'users.id_user')
-        ->join('alat', 'peminjaman.id_alat', '=', 'alat.id_alat')
-        ->select(
-            'users.username', 
-            'alat.nama_alat', 
-            'peminjaman.tanggal_pinjam', 
-            'peminjaman.status' 
-        )->get();
+            ->join('users', 'peminjaman.id_user', '=', 'users.id_user')
+            ->join('alat', 'peminjaman.id_alat', '=', 'alat.id_alat')
+            ->select('peminjaman.id_peminjaman', 'peminjaman.jumlah', 'users.username', 'alat.nama_alat', 'peminjaman.tanggal_pinjam', 'peminjaman.tanggal_kembali', 'peminjaman.status')
+            ->whereIn('status', ['ajukan peminjaman', 'dipinjam', 'ajukan kembali'])
+            ->orderBy('peminjaman.tanggal_kembali', 'asc')
+            ->get();
         return view('petugas.persetujuan.index', compact('persetujuan'));
+    }
+
+    function indexDaftarPeminjam()
+    {
+        $riwayat = DB::table('peminjaman')
+            ->join('users', 'peminjaman.id_user', '=', 'users.id_user')
+            ->join('alat', 'peminjaman.id_alat', '=', 'alat.id_alat')
+            ->select('peminjaman.id_peminjaman', 'peminjaman.jumlah', 'users.username', 'alat.nama_alat', 'peminjaman.tanggal_pinjam', 'peminjaman.tanggal_kembali', 'peminjaman.status')
+            ->whereIn('status', ['ditolak', 'dikembalikan'])
+            ->orderBy('peminjaman.tanggal_kembali', 'asc')
+            ->get();
+        return view('petugas.daftarPeminjam', compact('riwayat'));
+    }
+
+    public function laporan(Request $request)
+    {
+        // 1. Inisialisasi query Eloquent dari model Peminjaman
+        // Menggunakan Eager Loading 'with(['user', 'alat'])' agar query lebih efisien (mencegah N+1 Problem)
+        $query = Peminjaman::with(['user', 'alat']);
+
+        // 2. LOGIKA FILTER TANGGAL
+
+        // Opsi A: Jika KEDUA tanggal (tgl_mulai & tgl_selesai) diisi oleh user
+        if ($request->filled('tgl_mulai') && $request->filled('tgl_selesai')) {
+            // Menggunakan whereBetween untuk mengambil data di dalam rentang tanggal tersebut
+            // Menambahkan '00:00:00' dan '23:59:59' agar mencakup seluruh jam dari hari awal sampai hari akhir
+            $query->whereBetween('tanggal_pinjam', [$request->tgl_mulai . ' 00:00:00', $request->tgl_selesai . ' 23:59:59']);
+
+            // Opsi B: Jika HANYA 'tgl_mulai' yang diisi
+        } elseif ($request->filled('tgl_mulai')) {
+            // Ambil data yang tanggal pinjamnya dari tanggal tersebut ke depan (>=)
+            $query->whereDate('tanggal_pinjam', '>=', $request->tgl_mulai);
+
+            // Opsi C: Jika HANYA 'tgl_selesai' yang diisi
+        } elseif ($request->filled('tgl_selesai')) {
+            // Ambil data yang tanggal pinjamnya dari tanggal tersebut ke belakang (<=)
+            $query->whereDate('tanggal_pinjam', '<=', $request->tgl_selesai);
+        }
+
+        // 3. Eksekusi query dengan urutan data terbaru berdasarkan 'id_peminjaman'
+        $laporan = $query->latest('id_peminjaman')->get();
+
+        // 4. Kirimkan data $laporan ke tampilan Blade
+        return view('petugas.laporan.index', compact('laporan'));
     }
     public function riwayat()
     {
@@ -64,15 +108,13 @@ class PeminjamanController extends Controller
             'tanggal_kembali' => 'required',
         ]);
 
-        $alat = Alat::findOrFail($request->id_alat);
+        // if ($alat->stok < $request->jumlah) {
+        //     return redirect()->back()->with('error', 'Stok alat tidak mencukupi.');
+        // }
 
-        if ($alat->stok < $request->jumlah) {
-            return redirect()->back()->with('error', 'Stok alat tidak mencukupi.');
-        }
-
-        $alat->update([
-            'stok' => $alat->stok - $request->jumlah,
-        ]);
+        // $alat->update([
+        //     'stok' => $alat->stok - $request->jumlah,
+        // ]);
 
         Peminjaman::create([
             'id_alat' => $request->id_alat,
@@ -81,6 +123,10 @@ class PeminjamanController extends Controller
             'tanggal_pinjam' => $request->tanggal_pinjam,
             'tanggal_kembali' => $request->tanggal_kembali,
         ]);
+        $user = Auth::user();
+
+        // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+        LogAktivitas::catat('Mengajukan peminjaman', $user->username . ',Mengajukan Peminjaman', $user->id_user);
 
         return redirect('/peminjam/katalog')->with('success', 'Pengajuan berhasil ditambahkan');
     }
@@ -106,9 +152,76 @@ class PeminjamanController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Peminjaman $peminjaman)
+    public function updatePersetujuan(Request $request, $id)
     {
-        //
+        // 1. Ambil data peminjaman
+        $peminjaman = Peminjaman::findOrFail($id);
+
+        $statusLama = $peminjaman->status;
+        $statusBaru = $request->status;
+
+        // 2. Ambil data alat terkait
+        $alat = Alat::findOrFail($peminjaman->id_alat);
+
+        // 3. Logika Kelola Stok
+
+        // JIKA DISETUJUI PINJAM (ajukan peminjaman -> dipinjam)
+        if ($statusBaru == 'dipinjam' && $statusLama == 'ajukan peminjaman') {
+            // Cek kecukupan stok sebelum dikurangi
+
+            if ($alat->stok < $peminjaman->jumlah) {
+                $user = Auth::user();
+
+                // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+                LogAktivitas::catat('Menolak Peminjaman', $user->username . ' ,Menolak peminjaman karena stok habis', $user->id_user);
+                return redirect()->back()->with('error', 'Stok alat tidak mencukupi untuk disetujui!');
+            }
+
+            $user = Auth::user();
+
+            // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+            LogAktivitas::catat('Menyetujui Peminjaman', $user->username . ' ,Menyetujui peminjaman', $user->id_user);
+
+            // KURANGI STOK
+            $alat->decrement('stok', $peminjaman->jumlah);
+
+            // JIKA DISETUJUI PENGEMBALIAN (ajukan kembali / ajukan pengembalian -> dikembalikan)
+        } elseif ($statusBaru == 'dikembalikan' && in_array($statusLama, ['ajukan kembali', 'ajukan pengembalian'])) {
+            // TAMBAH KEMBALI STOK
+            $alat->increment('stok', $peminjaman->jumlah);
+
+            $user = Auth::user();
+
+            // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+            LogAktivitas::catat('Menyetujui pengembalian', $user->username . ' ,Menyetujui pengembalian', $user->id_user);
+        }else{
+               $user = Auth::user();
+
+            // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+            LogAktivitas::catat('Menolak peminjaman', $user->username . ' , Menolak peminjaman', $user->id_user);
+        }
+
+        // 4. Update status peminjaman di database
+        $peminjaman->update([
+            'status' => $statusBaru,
+        ]);
+
+        return redirect()->back()->with('success', 'Status peminjaman dan stok berhasil diperbarui!');
+    }
+
+    function updatePeminjaman(Request $request, $id)
+    {
+        $peminjaman = Peminjaman::findOrFail($id);
+        $peminjaman->update([
+            'status' => $request->status,
+        ]);
+
+        $user = Auth::user();
+
+        // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+        LogAktivitas::catat('Mengajukan pengmbalian', $user->username . ' ,Mengajukan pengembalian', $user->id_user);
+
+        return redirect()->back()->with('success', 'Berhasil mengajukan pengembalian');
     }
 
     /**

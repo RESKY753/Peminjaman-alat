@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id('id_histori');
 
             // Relasi Utama
-            $table->foreignId('id_peminjaman')->constrained('peminjaman', 'id_peminjaman')->onDelete('cascade');
-            $table->foreignId('id_user')->constrained('users', 'id_user')->onDelete('cascade');
+            $table->foreignId('id_peminjaman')->constrained('peminjaman', 'id_peminjaman')->onDelete('restrict');
+            $table->foreignId('id_user')->constrained('users', 'id_user')->onDelete('restrict');
 
             // Data Khusus Riwayat (Yang tidak ada / berubah dari tabel peminjaman awal)
             $table->timestamp('tanggal_dikembalikan'); // Waktu riil dikembalikan

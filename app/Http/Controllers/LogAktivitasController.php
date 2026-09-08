@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\LogAktivitas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class LogAktivitasController extends Controller
 {
@@ -12,7 +13,9 @@ class LogAktivitasController extends Controller
      */
     public function index()
     {
-        return view('admin.log.index');
+        $logAktivitas = LogAktivitas::with('User')->orderBy('created_at', 'desc')->get();
+        $total = LogAktivitas::count();
+        return view('admin.log.index', compact('logAktivitas', 'total'));
     }
 
     /**

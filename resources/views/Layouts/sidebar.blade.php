@@ -93,6 +93,12 @@
                                 class="fa-solid fa-file-invoice w-6 {{ request()->is('petugas/laporan*') ? 'text-white' : 'text-slate-500' }}"></i>
                             Cetak Laporan
                         </a>
+                        <a href="{{ url('/petugas/daftar') }}"
+                            class="flex items-center px-3 py-2 rounded-lg transition text-sm font-medium {{ request()->is('petugas/daftar*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
+                            <i
+                                class="fa-solid fa-list w-6 {{ request()->is('petugas/laporan*') ? 'text-white' : 'text-slate-500' }}"></i>
+                            Daftar peminjam
+                        </a>
                     </div>
                 @endif
 
