@@ -16,14 +16,10 @@ return new class extends Migration
 
             // Relasi Utama
             $table->foreignId('id_peminjaman')->constrained('peminjaman', 'id_peminjaman')->onDelete('restrict');
-            $table->foreignId('id_user')->constrained('users', 'id_user')->onDelete('restrict');
-
             // Data Khusus Riwayat (Yang tidak ada / berubah dari tabel peminjaman awal)
-            $table->timestamp('tanggal_dikembalikan'); // Waktu riil dikembalikan
-            $table->enum('status_akhir', ['dikembalikan', 'denda', 'hilang'])->default('dikembalikan');
-            $table->text('catatan_petugas')->nullable(); // Misal: "Lensa kamera agak kotor saat dikembalikan"
+            $table->enum('status_akhir', ['dikembalikan', 'ditolak']);
 
-            $table->timestamps();
+            $table->timestamp('creted_at');
         });
     }
 

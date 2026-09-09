@@ -8,6 +8,7 @@ class HistoriPinjaman extends Model
 {
     protected $table = "histori_pinjaman";
     protected $primaryKey = 'id_histori';
+    public $timestamps = false;
     protected  $guarded = ['id_histori'];
 
     function user(){

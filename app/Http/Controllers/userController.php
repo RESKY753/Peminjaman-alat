@@ -65,7 +65,7 @@ class userController extends Controller
         return back()->with('error', 'Email/Username atau Password salah!')->withInput();
     }
 
-    function indexUser(Request $request)
+    function inde5xUser(Request $request)
     {
         $query = User::query();
 

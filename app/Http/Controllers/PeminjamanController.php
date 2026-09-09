@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Alat;
+use App\Models\HistoriPinjaman;
 use App\Models\LogAktivitas;
 use App\Models\Peminjaman;
 use Illuminate\Http\Request;
@@ -136,7 +137,7 @@ class PeminjamanController extends Controller
      */
     public function pinjamanSaya($id)
     {
-        $pinjamanSaya = DB::table('peminjaman')->join('alat', 'peminjaman.id_alat', '=', 'alat.id_alat')->select('alat.nama_alat', 'alat.foto', 'peminjaman.id_peminjaman', 'peminjaman.status', 'peminjaman.jumlah', 'peminjaman.tanggal_pinjam', 'peminjaman.tanggal_kembali')->where('id_user', $id)->get();
+        $pinjamanSaya = DB::table('peminjaman')->join('alat', 'peminjaman.id_alat', '=', 'alat.id_alat')->select('alat.nama_alat', 'alat.foto', 'peminjaman.id_peminjaman', 'peminjaman.status', 'peminjaman.jumlah', 'peminjaman.tanggal_pinjam', 'peminjaman.tanggal_kembali')->where('id_user', $id, 'status', ['dikembalikan', 'ditolak'])->get();
 
         return view('peminjam.pinjaman', compact('pinjamanSaya'));
     }
@@ -189,6 +190,12 @@ class PeminjamanController extends Controller
         } elseif ($statusBaru == 'dikembalikan' && in_array($statusLama, ['ajukan kembali', 'ajukan pengembalian'])) {
             // TAMBAH KEMBALI STOK
             $alat->increment('stok', $peminjaman->jumlah);
+            //tambah data di tabel histori
+            HistoriPinjaman::create([
+                'id_peminjaman' => $peminjaman->id_peminjaman,
+                'status_akhir' => $statusBaru,
+                'creted_at' => now(),
+            ]);
 
             $user = Auth::user();
 

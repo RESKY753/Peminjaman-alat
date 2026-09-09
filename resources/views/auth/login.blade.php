@@ -26,6 +26,8 @@
 
 <body class="bg-slate-900 text-slate-800 min-h-screen flex items-center justify-center p-4">
 
+    {{-- @dd(Auth::user()->role) --}}
+
     <!-- Card Login Container -->
     <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-800">
 
