@@ -20,15 +20,15 @@ Route::get('/', function () {
 Route::post('/login', [userController::class, 'proseslogin'])->name('login.proses');
  Route::post('/logout', [userController::class, 'logout'])->name('logout');
 
-Route::get('/force-logout', function () {
-    Auth::logout();
+// Route::get('/force-logout', function () {
+//     Auth::logout();
     
-    // Hapus seluruh data sesi dan regenerate token keamanan
-    session()->invalidate();
-    session()->regenerateToken();
+//     // Hapus seluruh data sesi dan regenerate token keamanan
+//     session()->invalidate();
+//     session()->regenerateToken();
     
-    return redirect('/')->with('error', 'Sesi Anda diakhiri karena percobaan akses terlarang.');
-});
+//     return redirect('/')->with('error', 'Sesi Anda diakhiri karena percobaan akses terlarang.');
+// });
 
 // Route Yang Membutuhkan Session Login (Protected)
 // =======================ADMIN=============================
@@ -51,6 +51,14 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/alat/delete/{id}', [AlatController::class, 'destroy']);
     Route::put('/admin/alat/update/{id}', [AlatController::class, 'update']);
     Route::get('/admin/alat/edit/{id}', [AlatController::class, 'edit']);
+    //======================Pinjam alat admin=====================================
+
+    Route::get('/admin/katalog', [AlatController::class, 'indexKatalogAdmin']);
+    Route::get('/admin/pinjaman/{id}', [PeminjamanController::class, 'pinjamanSayaAdmin']);
+    Route::get('/admin/histori/{id}', [HistoriPinjamanController::class, 'indexAdmin']);
+    Route::get('/admin/katalog/{id}/create', [PeminjamanController::class, 'createAdmin']);
+    Route::post('/admin/pinjam/store', [PeminjamanController::class, 'storeAdmin']);
+    Route::put('/admin/pinjaman/update/{id}', [PeminjamanController::class, 'updatePeminjamanAdmin']);
 });
 
 Route::middleware(['auth', 'role:peminjam'])->group(function () {

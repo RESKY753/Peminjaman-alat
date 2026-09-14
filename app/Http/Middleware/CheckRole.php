@@ -11,19 +11,20 @@ class CheckRole
 {
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        // 1. Cek apakah user sudah login
+        // 1. Cek apakah user belum login sama sekali
         if (!Auth::check()) {
-            return redirect('/');
+            return redirect('/')->with('error', 'Silakan login terlebih dahulu.');
         }
 
         $user = Auth::user();
 
-        // 2. Cek apakah role sesuai
+        // 2. Cek apakah role user ada di dalam daftar role yang diizinkan
         if (in_array($user->role, $roles)) {
             return $next($request);
         }
 
-        // 3. Jika tidak cocok, tampilkan view kustom 403 lengkap dengan countdown
-        return response()->view('error.403', [], 403);
+        // 3. Jika user sudah login tapi role-nya salah (misal peminjam maksa buka admin),
+        // kembalikan ke halaman sebelumnya dengan pesan peringatan
+        return redirect()->back()->with('error', 'Akses ditolak! Anda tidak memiliki izin ke halaman tersebut.');
     }
 }

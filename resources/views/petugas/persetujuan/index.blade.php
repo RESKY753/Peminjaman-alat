@@ -49,6 +49,7 @@
                         <tr>
                             <th class="px-6 py-3.5">Nama Peminjam</th>
                             <th class="px-6 py-3.5">Alat & Jumlah</th>
+                            <th class="px-6 py-3.5">Jaminan</th>
                             <th class="px-6 py-3.5">Tgl Pinjam</th>
                             <th class="px-6 py-3.5">Batas Kembali</th>
                             <th class="px-6 py-3.5">Status</th>
@@ -73,6 +74,10 @@
                                     <p class="font-semibold text-slate-700">
                                         {{ $item->nama_alat ?? ($item->alat->nama_alat ?? '-') }}</p>
                                     <span class="text-xs text-slate-400">Jumlah: {{ $item->jumlah }} Unit</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="font-semibold text-slate-700">
+                                        {{ $item->jaminan }}</p>
                                 </td>
 
                                 <!-- Tanggal Pinjam -->

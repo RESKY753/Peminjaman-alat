@@ -60,15 +60,14 @@
                                             title="Edit Kategori">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </button>
-                                        <form id="delete-form-{{ $kat->id_kategori }}"
-                                            action="/admin/kategori/delete/{{ $kat->id_kategori }}" method="POST"
+                                        <form action="/admin/kategori/delete/{{ $kat->id_kategori }}" method="POST"
+                                            onsubmit="return confirm('Apakah kamu yakin ingin menghapus kategori {{ $kat->nama_kategori }}?')"
                                             class="inline">
                                             @csrf
-                                            @method('POST')
-                                            <button type="button"
-                                                onclick="showAlertConfirm('Hapus User?', 'Apakah kamu yakin ingin menghapus {{ $kat->nama_kategori }}?', function() { document.getElementById('delete-form-{{ $kat->id_kategori }}').submit(); })"
+
+                                            <button type="submit"
                                                 class="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition"
-                                                title="Hapus User">
+                                                title="Hapus Kategori">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </form>

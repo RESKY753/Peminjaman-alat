@@ -12,7 +12,25 @@ class HistoriPinjamanController extends Controller
      */
     public function index($id)
     {
-        return view('peminjam.histori.index');
+        $histori = HistoriPinjaman::with(['peminjaman.alat'])
+            ->whereHas('peminjaman', function ($query) use ($id) {
+                $query->where('id_user', $id);
+            })
+            ->whereIn('status_akhir', ['dikembalikan', 'ditolak'])
+            ->orderBy('creted_at','desc')
+            ->get();
+        return view('peminjam.histori.index', compact('histori'));
+    }
+    public function indexAdmin($id)
+    {
+        $histori = HistoriPinjaman::with(['peminjaman.alat'])
+            ->whereHas('peminjaman', function ($query) use ($id) {
+                $query->where('id_user', $id);
+            })
+            ->whereIn('status_akhir', ['dikembalikan', 'ditolak'])
+            ->orderBy('creted_at','desc')
+            ->get();
+        return view('admin.histori.index', compact('histori'));
     }
 
     /**

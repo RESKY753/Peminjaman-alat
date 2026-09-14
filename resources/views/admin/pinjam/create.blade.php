@@ -63,7 +63,7 @@
                 </div>
             @endif
             <!-- Form Pengajuan -->
-            <form action="{{ url('/peminjam/pinjam/store') }}" method="POST" class="space-y-4">
+            <form action="{{ url('/admin/pinjam/store') }}" method="POST" class="space-y-4">
                 @csrf
                 <input type="hidden" name="id_alat" value="{{ $alat->id_alat }}">
                 <input type="hidden" name="tanggal_pinjam" value="{{ now()->toDateString() }}">
@@ -97,7 +97,7 @@
 
                 <!-- Action Buttons -->
                 <div class="pt-3 flex justify-end space-x-2 border-t border-slate-100">
-                    <a href="{{ url('/peminjam/katalog') }}"
+                    <a href="{{ url('/admin/katalog') }}"
                         class="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-200 transition inline-flex items-center">
                         Batal
                     </a>

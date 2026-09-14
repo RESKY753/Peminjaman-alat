@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('id_log');
             $table->unsignedBigInteger('id_user');
 
-            $table->foreign('id_user')->references('id_user')->on('users')->onDelete('restrict');
+            $table->foreign('id_user')->references('id_user')->on('users')->onDelete('cascade');
             $table->string('aktifitas');
             $table->string('keterangan', 150);
             $table->timestamps();

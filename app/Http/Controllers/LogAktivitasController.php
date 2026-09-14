@@ -63,6 +63,6 @@ class LogAktivitasController extends Controller
      */
     public function destroy(LogAktivitas $logAktivitas)
     {
-        tes
+    
     }
 }

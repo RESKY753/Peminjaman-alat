@@ -68,6 +68,37 @@ class AlatController extends Controller
 
         return view('peminjam.katalog.index', compact('alat', 'kategori'));
     }
+    public function indexKatalogAdmin(Request $request)
+    {
+        $kategori = Kategori::all();
+
+        $query = Alat::with('kategori');
+
+        // Filter Kategori
+        if ($request->filled('kategori')) {
+            $query->where('id_kategori', $request->kategori);
+
+            $user = Auth::user();
+
+            // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+            LogAktivitas::catat('Mencari alat berdasarkan kategori', $user->username . ' ,Mencari alat bersarkan kategori', $user->id_user);
+        }
+
+        // Filter Pencarian Nama Alat
+        if ($request->filled('search')) {
+            $query->where('nama_alat', 'like', '%' . $request->search . '%');
+
+            $user = Auth::user();
+
+            // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+            LogAktivitas::catat('Mencari alat berdasarkan nama', $user->username . ' ,Mencari alat berdasarkan nama', $user->id_user);
+        }
+
+        // Urutkan stok > 0 di atas, stok 0 di paling bawah
+        $alat = $query->orderByRaw('stok = 0 ASC')->orderBy('id_alat', 'DESC')->paginate(12)->withQueryString();
+
+        return view('admin.katalog.index', compact('alat', 'kategori'));
+    }
 
     public function create()
     {
@@ -90,6 +121,14 @@ class AlatController extends Controller
             'foto' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
             'created_at' => now(),
             'updated_at' => now(),
+        ],[
+            'nama_alat.required' => 'Nama wajib diisi',
+            'stok.required' => 'Stok minimal 1',
+            'kondisi.required' => 'kondisi wajib diisi',
+            'spesifikasi.required' => 'Spesifikasi wajib diisi',
+            'foto.required' => 'wajib wajib diisi',
+            'foto.mimes' => 'Foto harus berformat jpeg,png,jpg,webp',
+            'foto.max' => 'Foto max 2mb',
         ]);
         // 2. Proses Upload Foto
         if ($request->hasFile('foto')) {

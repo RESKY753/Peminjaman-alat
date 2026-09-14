@@ -72,6 +72,30 @@
                                 class="fa-solid fa-clock-rotate-left w-6 {{ request()->is('admin/log*') ? 'text-white' : 'text-slate-500' }}"></i>
                             Log Aktivitas
                         </a>
+                        <div class="pt-4">
+                            <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Pinjam
+                                alat
+                            </p>
+                            <a href="{{ url('/admin/katalog') }}"
+                                class="flex items-center px-3 py-2 rounded-lg transition text-sm font-medium {{ request()->is('peminjam/katalog*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
+                                <i
+                                    class="fa-solid fa-layer-group w-6 {{ request()->is('peminjam/katalog*') ? 'text-white' : 'text-slate-500' }}"></i>
+                                Katalog Alat
+                            </a>
+
+                            <a href="{{ url('/admin/pinjaman/' . auth()->id()) }}"
+                                class="flex items-center px-3 py-2 rounded-lg transition text-sm font-medium {{ request()->is('peminjam/pinjaman*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
+                                <i
+                                    class="fa-solid fa-hand-holding w-6 {{ request()->is('peminjam/pinjaman*') ? 'text-white' : 'text-slate-500' }}"></i>
+                                Pinjaman Saya
+                            </a>
+                            <a href="{{ url('/admin/histori/' . auth()->id()) }}"
+                                class="flex items-center px-3 py-2 rounded-lg transition text-sm font-medium {{ request()->is('peminjam/histori*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
+                                <i
+                                    class="fa-solid fa-clock-rotate-left w-6 {{ request()->is('peminjam/histori*') ? 'text-white' : 'text-slate-500' }}"></i>
+                                <span>Histori Peminjaman</span>
+                            </a>
+                        </div>
                     </div>
                 @endif
 
