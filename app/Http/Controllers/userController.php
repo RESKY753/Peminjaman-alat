@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Alat;
 use App\Models\HistoriPinjaman;
+use App\Models\Kategori;
 use App\Models\LogAktivitas;
+use App\Models\Peminjaman;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +16,26 @@ use Illuminate\Database\QueryException; // WAJIB DI-IMPORT UNTUK TANGKAP ERROR R
 
 class userController extends Controller
 {
+    function indexDashboard()
+    {
+        $totalAlat = Alat::count();
+        $totalUser = User::count();
+        $totalKategori = Kategori::count();
+        $totalLog = LogAktivitas::count();
+
+        // Data tambahan jika diperlukan
+        $myPinjamanCount = Peminjaman::where('id_user', Auth::user()->id_user)
+            ->whereNotIn('status', ['dikembalikan', 'ditolak'])
+            ->count();
+        $katalogCount = Alat::where('stok', '>', 0)->count();
+
+        $pendingCount = Peminjaman::whereNotIn('status', ['dikembalikan', 'dipinjam', 'ditolak'])->count();
+        $activePinjamCount = Peminjaman::where('status', ['dipinjam'])->count();
+        $totalPeminjam = Peminjaman::whereNotIn('status', ['ditolak', 'dikembalikan'])->count();
+
+        return view('Layouts.dashboard', compact('totalAlat', 'totalUser', 'totalKategori', 'totalLog', 'myPinjamanCount', 'katalogCount', 'pendingCount','activePinjamCount', 'totalPeminjam'));
+        return view('Layouts.dashboard');
+    }
     public function index()
     {
         return view('auth.login');
@@ -39,25 +62,17 @@ class userController extends Controller
 
         // 3. Coba Autentikasi
         if (Auth::attempt($credentials)) {
-            // KODE KUNCI: Regenerasi session agar tersimpan resmi di server
             $request->session()->regenerate();
-
             $user = Auth::user();
 
-            // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-            LogAktivitas::catat('Login', 'User ' . $user->username . ' berhasil login', $user->id_user);
+            LogAktivitas::catat('Login', 'User ' . $user->username . ' berhasil login' . $user->id_user);
 
-            // Direct berdasarkan role
-            $role = Auth::user()->role;
-            
-
-            if ($role === 'admin') {
-                return redirect()->route('dashboardadmin');
-            } elseif ($role === 'peminjam') {
-                return redirect()->route('dp');
-            } elseif ($role === 'petugas') {
-                return redirect()->route('dpetugas');
+            // cek sudah ada sesion apa belum
+            if (Auth::check()) {
+                return redirect()->route('dashboard');
             }
+
+            //jika tidak ada session kode ini akan dijalankan
             return redirect()->to('/');
         }
 
@@ -77,7 +92,7 @@ class userController extends Controller
                 $user = Auth::user();
 
                 // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-                LogAktivitas::catat('Mencari nama pengguna', 'User ' . $user->username . ' berhasil mencari nama pengguna', $user->id_user);
+                LogAktivitas::catat('Mencari nama pengguna', 'User ' . $user->username . ' berhasil mencari nama pengguna');
             });
         }
 
@@ -88,7 +103,7 @@ class userController extends Controller
             $user = Auth::user();
 
             // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-            LogAktivitas::catat('Mencari pengguna berdasrkan role', 'User ' . $user->username . ' berhasil mencari role', $user->id_user);
+            LogAktivitas::catat('Mencari pengguna berdasarkan role', 'User ' . $user->username . ' berhasil mencari role');
         }
 
         // 3. Batasi 15 Data Per Halaman & Simpan Query Parameter saat Pindah Halaman
@@ -131,7 +146,7 @@ class userController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Menambahkan user', 'User ' . $user->username . ' Menambahkan User', $user->id_user);
+        LogAktivitas::catat('Menambahkan user', 'User ' . $user->username . ' Menambahkan User: ' . $request->username);
 
         return redirect('admin/user')->with('success', 'User berhasil diitambahkan');
     }
@@ -181,7 +196,7 @@ class userController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Mengubah data user', 'User ' . $user->username . ' Mengubah data user', $user->id_user);
+        LogAktivitas::catat('Mengubah data user', 'User ' . $user->username . ' Mengubah data user:' . $id);
 
         return redirect('/admin/user')->with('success', 'User berhasil diubah');
     }
@@ -200,7 +215,7 @@ class userController extends Controller
             $admin = Auth::user();
 
             // 4. Catat ke log aktivitas (Hanya jalan kalau hapus BERHASIL)
-            LogAktivitas::catat('Menghapus User', 'Admin ' . $admin->username . ' menghapus user ' . $namaTarget, $admin->id_user);
+            LogAktivitas::catat('Menghapus User', 'Admin ' . $admin->username . ' menghapus user ' . $id);
 
             return redirect()->back()->with('success', 'User berhasil dihapus.');
         } catch (QueryException $e) {
@@ -219,7 +234,7 @@ class userController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Logout', $user->username . ' logout', $user->id_user);
+        LogAktivitas::catat('Logout', $user->username . ' logout' . $user->id_user);
         // 1. Logout dari guard admin
         Auth::logout();
 

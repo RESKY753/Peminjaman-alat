@@ -146,7 +146,7 @@ class PeminjamanController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Mengajukan peminjaman', $user->username . ',Mengajukan Peminjaman', $user->id_user);
+        LogAktivitas::catat('Mengajukan peminjaman', $user->username . ', Mengajukan Peminjaman:'. ' ALT-0'.$request->id_alat);
 
         return redirect('/peminjam/katalog')->with('success', 'Pengajuan berhasil ditambahkan');
     }
@@ -172,7 +172,7 @@ class PeminjamanController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Mengajukan peminjaman', $user->username . ',Mengajukan Peminjaman', $user->id_user);
+        LogAktivitas::catat('Mengajukan peminjaman', $user->username . ', Mengajukan Peminjaman:'.' ALT-0'. $request->id_alat);
 
         return redirect('/admin/katalog')->with('success', 'Pengajuan berhasil ditambahkan');
     }
@@ -225,14 +225,14 @@ class PeminjamanController extends Controller
                 $user = Auth::user();
 
                 // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-                LogAktivitas::catat('Menolak Peminjaman', $user->username . ' ,Menolak peminjaman karena stok habis', $user->id_user);
+                LogAktivitas::catat('Menolak Peminjaman', $user->username . ', Menolak peminjaman karena stok habis'. $id);
                 return redirect()->back()->with('error', 'Stok alat tidak mencukupi untuk disetujui!');
             }
 
             $user = Auth::user();
 
             // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-            LogAktivitas::catat('Menyetujui Peminjaman', $user->username . ' ,Menyetujui peminjaman', $user->id_user);
+            LogAktivitas::catat('Menyetujui Peminjaman', $user->username . ', Menyetujui peminjaman:'. $id);
 
             // KURANGI STOK
             $alat->decrement('stok', $peminjaman->jumlah);
@@ -251,12 +251,12 @@ class PeminjamanController extends Controller
             $user = Auth::user();
 
             // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-            LogAktivitas::catat('Menyetujui pengembalian', $user->username . ' ,Menyetujui pengembalian', $user->id_user);
+            LogAktivitas::catat('Menyetujui pengembalian', $user->username . ', Menyetujui pengembalian:'. $id);
         }else{
                $user = Auth::user();
 
             // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-            LogAktivitas::catat('Menolak peminjaman', $user->username . ' , Menolak peminjaman', $user->id_user);
+            LogAktivitas::catat('Menolak peminjaman', $user->username . ', Menolak peminjaman:'. $id);
 
              HistoriPinjaman::create([
                 'id_peminjaman' => $peminjaman->id_peminjaman,
@@ -283,7 +283,7 @@ class PeminjamanController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Mengajukan pengmbalian', $user->username . ' ,Mengajukan pengembalian', $user->id_user);
+        LogAktivitas::catat('Mengajukan pengmbalian', $user->username . ', Mengajukan pengembalian:'. $id);
 
         return redirect()->back()->with('success', 'Berhasil mengajukan pengembalian');
     }
@@ -297,7 +297,7 @@ class PeminjamanController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Mengajukan pengmbalian', $user->username . ' ,Mengajukan pengembalian', $user->id_user);
+        LogAktivitas::catat('Mengajukan pengmbalian', $user->username . ', Mengajukan pengembalian:'. $id);
 
         return redirect()->back()->with('success', 'Berhasil mengajukan pengembalian');
     }

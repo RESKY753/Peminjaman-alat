@@ -25,7 +25,7 @@ class AlatController extends Controller
             $user = Auth::user();
 
             // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-            LogAktivitas::catat('Mencari nama alat', $user->username . ' ,Mencari nama alat', $user->id_user);
+            LogAktivitas::catat('Mencari nama alat', $user->username . ' ,Mencari nama alat'. $user->id_user);
         }
 
         // Paginasi 15 data per halaman
@@ -50,7 +50,7 @@ class AlatController extends Controller
             $user = Auth::user();
 
             // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-            LogAktivitas::catat('Mencari alat berdasarkan kategori', $user->username . ' ,Mencari alat bersarkan kategori', $user->id_user);
+            LogAktivitas::catat('Mencari alat berdasarkan kategori', $user->username . ' ,Mencari alat bersarkan kategori'. $user->id_user);
         }
 
         // Filter Pencarian Nama Alat
@@ -60,7 +60,7 @@ class AlatController extends Controller
             $user = Auth::user();
 
             // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-            LogAktivitas::catat('Mencari alat berdasarkan nama', $user->username . ' ,Mencari alat berdasarkan nama', $user->id_user);
+            LogAktivitas::catat('Mencari alat berdasarkan nama', $user->username . ' ,Mencari alat berdasarkan nama'. $user->id_user);
         }
 
         // Urutkan stok > 0 di atas, stok 0 di paling bawah
@@ -81,7 +81,7 @@ class AlatController extends Controller
             $user = Auth::user();
 
             // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-            LogAktivitas::catat('Mencari alat berdasarkan kategori', $user->username . ' ,Mencari alat bersarkan kategori', $user->id_user);
+            LogAktivitas::catat('Mencari alat berdasarkan kategori', $user->username . ' ,Mencari alat bersarkan kategori'. $user->id_user);
         }
 
         // Filter Pencarian Nama Alat
@@ -91,7 +91,7 @@ class AlatController extends Controller
             $user = Auth::user();
 
             // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-            LogAktivitas::catat('Mencari alat berdasarkan nama', $user->username . ' ,Mencari alat berdasarkan nama', $user->id_user);
+            LogAktivitas::catat('Mencari alat berdasarkan nama', $user->username . ' ,Mencari alat berdasarkan nama'. $user->id_user);
         }
 
         // Urutkan stok > 0 di atas, stok 0 di paling bawah
@@ -154,7 +154,7 @@ class AlatController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Menambahkan Alat', $user->username . ' ,Menambahkan Alat', $user->id_user);
+        LogAktivitas::catat('Menambahkan Alat', $user->username . ', Menambahkan Alat:'. $request->nama_alat);
 
         return redirect('/admin/alat')->with('success', 'Alat berhasil ditambahkan');
     }
@@ -226,7 +226,7 @@ class AlatController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Mengubah alat', $user->username . ' ,Mengubah alat', $user->id_user);
+        LogAktivitas::catat('Mengubah alat', $user->username . ', Mengubah alat:'. ' ALT-0'.$id);
 
         return redirect('admin/alat')->with('success', 'Alat berhasil diubah');
     }
@@ -240,7 +240,7 @@ class AlatController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Menghapus alat', $user->username . ' ,Menghapus alat', $user->id_user);
+        LogAktivitas::catat('Menghapus alat', $user->username . ' ,Menghapus alat:'. ' ALT-0'.$id);
         return redirect()->back()->with('success', 'Alat berhasil dihapus');
     }
 }

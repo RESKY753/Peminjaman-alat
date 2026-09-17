@@ -48,7 +48,7 @@ class KategoriController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Menambahkan kategori', $user->username . ' ,Menambahkan kategori', $user->id_user);
+        LogAktivitas::catat('Menambahkan kategori', $user->username . ', Menambahkan kategori:'. $request->nama_kategori);
         return redirect()->back()->with('success', 'Data berhasil ditambahkan');
     }
 
@@ -83,7 +83,7 @@ class KategoriController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Mengubah kategori', $user->username . ' ,Mengubah kategori', $user->id_user);
+        LogAktivitas::catat('Mengubah kategori', $user->username . ', Mengubah kategori:'. ' KTG-0'.$id);
 
         return redirect()->back()->with('success', 'Kategori berhasil diubah');
     }
@@ -98,7 +98,7 @@ class KategoriController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Menghapus kategori', $user->username . ' ,Menghapus kategori', $user->id_user);
+        LogAktivitas::catat('Menghapus kategori', $user->username . ', Menghapus kategori:'. ' KTG-0'.$id);
 
         return redirect()->back()->with('success', 'Kategori berhasil dihapus');
     }
