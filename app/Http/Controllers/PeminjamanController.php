@@ -147,6 +147,7 @@ class PeminjamanController extends Controller
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
         LogAktivitas::catat('Mengajukan peminjaman', $user->username . ', Mengajukan Peminjaman:'. ' ALT-0'.$request->id_alat);
+        
 
         return redirect('/peminjam/katalog')->with('success', 'Pengajuan berhasil ditambahkan');
     }

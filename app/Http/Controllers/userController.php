@@ -203,11 +203,19 @@ class userController extends Controller
 
     public function destroy($id)
     {
-        try {
+        // try {
             // 1. Cari user yang mau dihapus & simpan namanya sebelum hilang
-            $targetUser = User::findOrFail($id);
+            $targetUser = User::with('peminjaman')->findOrFail($id);
             $namaTarget = $targetUser->username;
+            $masihDipinjam = $targetUser->peminjaman()
+            ->whereIn('status', ['dipinjam','ajukan kembali'])
+            ->exists();
 
+           
+
+            if ($masihDipinjam) {
+                 return redirect()->back()->with('error','User tidak bisa di hapus karena masih meminjam alat');
+            }else{
             // 2. Eksekusi hapus user
             $targetUser->delete();
 
@@ -215,18 +223,19 @@ class userController extends Controller
             $admin = Auth::user();
 
             // 4. Catat ke log aktivitas (Hanya jalan kalau hapus BERHASIL)
-            LogAktivitas::catat('Menghapus User', 'Admin ' . $admin->username . ' menghapus user ' . $id);
+            LogAktivitas::catat('Menghapus User', 'Admin ' . $admin->username . ' menghapus user ' . $namaTarget);
 
             return redirect()->back()->with('success', 'User berhasil dihapus.');
-        } catch (QueryException $e) {
-            // 5. TANGKAP ERROR RESTRICT DI SINI (SQLSTATE 23000)
-            if ($e->getCode() == '23000') {
-                return redirect()->back()->with('error', 'User tidak bisa dihapus karena masih memiliki riwayat transaksi atau log aktivitas!');
             }
+        // } catch (QueryException $e) {
+        //     // 5. TANGKAP ERROR RESTRICT DI SINI (SQLSTATE 23000)
+        //     if ($e->getCode() == '23000') {
+        //         return redirect()->back()->with('error', 'User tidak bisa dihapus karena masih memiliki riwayat transaksi atau log aktivitas!');
+        //     }
 
-            // Kalau ada error database lainnya
-            return redirect()->back()->with('error', 'Gagal menghapus user dari database.');
-        }
+        //     // Kalau ada error database lainnya
+        //     return redirect()->back()->with('error', 'Gagal menghapus user dari database.');
+        // }
     }
 
     function logout(Request $request)

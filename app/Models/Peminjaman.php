@@ -20,6 +20,6 @@ class Peminjaman extends Model
     }
 
     function Histori(){
-        return $this->hasOne(HistoriPinjaman::class,'id_histori','id_histori');
+        return $this->hasOne(HistoriPinjaman::class,'id_peminjaman','id_peminjaman');
     }
 }

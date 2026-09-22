@@ -24,25 +24,14 @@ class User extends Authenticatable
 
     protected $guarded = ['id_user'];
 
-    protected $fillable = [
-        'username',
-        'email',
-        'telp',
-        'password',
-        'role',
-        'created_at',
-        'updated_at',
-    ];
+    protected $fillable = ['username', 'email', 'telp', 'password', 'role', 'created_at', 'updated_at'];
 
     /**
      * The attributes that should be hidden for serialization.
      *
      * @var list<string>
      */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token'];
 
     /**
      * Get the attributes that should be cast.
@@ -59,15 +48,15 @@ class User extends Authenticatable
 
     public function peminjaman()
     {
-        return $this->hasMany(Peminjaman::class, 'id_peminjaman', 'id_peminjaman');
+        return $this->hasMany(Peminjaman::class, 'id_user', 'id_user');
     }
 
     public function logaktifitas()
     {
-        return $this->hasMany(LogAktivitas::class, 'id_log', 'id_log');
+        return $this->hasMany(LogAktivitas::class, 'id_user', 'id_user');
     }
-     function Histori(){
-        return $this->hasMany(HistoriPinjaman::class,'id_histori','id_histori');
+    function Histori()
+    {
+        return $this->hasMany(HistoriPinjaman::class, 'id_user', 'id_user');
     }
-
 }
