@@ -3,11 +3,10 @@
 @section('content')
     <div class="space-y-6">
 
-        <!-- CSS Khusus Mode Cetak (Sembunyikan Form & Navbar saat Cetak / Save PDF) -->
+        <!-- CSS Khusus Mode Cetak -->
         <style>
             @media print {
 
-                /* Sembunyikan elemen navigasi dan tombol filter saat dialog print dibuka */
                 aside,
                 header,
                 nav,
@@ -15,12 +14,10 @@
                     display: none !important;
                 }
 
-                /* Ubah background halaman menjadi putih bersih */
                 body {
                     background-color: white !important;
                 }
 
-                /* Hilangkan border dan shadow pada container cetak */
                 .print-area {
                     border: none !important;
                     box-shadow: none !important;
@@ -29,17 +26,17 @@
             }
         </style>
 
-        <!-- Title Header (Sembunyi saat Cetak) -->
+        <!-- Title Header -->
         <div class="bg-white p-5 rounded-xl border border-slate-200 no-print">
-            <h2 class="text-xl font-bold text-slate-800">Cetak Laporan Peminjaman</h2>
-            <p class="text-xs text-slate-500">Filter berdasarkan rentang tanggal untuk pratinjau dan mengunduh/mencetak
-                laporan PDF.</p>
+            <h2 class="text-xl font-bold text-slate-800">Cetak & Unduh Laporan Peminjaman</h2>
+            <p class="text-xs text-slate-500">Filter berdasarkan rentang tanggal untuk pratinjau, cetak PDF, atau unduh ke
+                Excel.</p>
         </div>
 
-        <!-- Form Filter Tanggal & Tombol Aksi (Sembunyi saat Cetak) -->
+        <!-- Form Filter & Tombol Aksi -->
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm no-print">
             <form method="GET" action="{{ url('/petugas/laporan') }}"
-                class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
 
                 <!-- Input Tanggal Mulai -->
                 <div>
@@ -60,7 +57,7 @@
                     <button type="submit"
                         class="w-full py-2 bg-slate-800 text-white rounded-lg text-xs font-semibold hover:bg-slate-700 transition flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-filter"></i>
-                        <span>Filter Data</span>
+                        <span>Filter</span>
                     </button>
                 </div>
 
@@ -75,18 +72,27 @@
                     </div>
                 @endif
 
-                <!-- Tombol Print -->
+                <!-- Tombol Print / PDF -->
                 <div>
                     <button type="button" onclick="window.print()"
-                        class="w-full py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition flex items-center justify-center space-x-2 shadow-sm shadow-indigo-100">
+                        class="w-full py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition flex items-center justify-center space-x-2 shadow-sm">
                         <i class="fa-solid fa-print"></i>
-                        <span>Cetak / Save PDF</span>
+                        <span>Cetak / PDF</span>
                     </button>
+                </div>
+
+                <!-- Tombol Download Excel -->
+                <div>
+                    <a href="{{ url('/petugas/laporan/excel?' . http_build_query(request()->all())) }}"
+                        class="w-full py-2 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 transition flex items-center justify-center space-x-2 shadow-sm">
+                        <i class="fa-solid fa-file-excel"></i>
+                        <span>Unduh Excel</span>
+                    </a>
                 </div>
             </form>
         </div>
 
-        <!-- Area Tabel Laporan (Area Utama yang Akan Tercetak di Kertas/PDF) -->
+        <!-- Area Tabel Laporan -->
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm print-area space-y-4">
 
             <!-- Kop Laporan -->
@@ -94,7 +100,6 @@
                 <h1 class="text-xl font-bold uppercase tracking-wider text-slate-800">Laporan Peminjaman Alat</h1>
                 <p class="text-xs text-slate-500">Sistem Informasi Inventory & Peminjaman Alat</p>
 
-                <!-- Status Keterangan Periode Filter Tanggal -->
                 <p class="text-[11px] text-slate-400">
                     Periode:
                     <span class="font-semibold text-slate-700">
@@ -104,8 +109,7 @@
                         @elseif (request('tgl_mulai'))
                             Mulai {{ \Carbon\Carbon::parse(request('tgl_mulai'))->locale('id')->isoFormat('D MMMM YYYY') }}
                         @elseif (request('tgl_selesai'))
-                            Sampai
-                            {{ \Carbon\Carbon::parse(request('tgl_selesai'))->locale('id')->isoFormat('D MMMM YYYY') }}
+                            Sampai {{ \Carbon\Carbon::parse(request('tgl_selesai'))->locale('id')->isoFormat('D MMMM YYYY') }}
                         @else
                             Semua Data
                         @endif
@@ -131,37 +135,33 @@
 
                         @forelse ($laporan as $index => $item)
                             <tr>
-                                <!-- Nomor Urut -->
-                                <td class="px-4 py-3 border font-medium text-slate-800">{{ $index + 1 }}</td>
+                                <!-- Nomor Urut Menyesuaikan Pagination (10 data per halaman) -->
+                                <td class="px-4 py-3 border font-medium text-slate-800">
+                                    {{ $laporan->firstItem() + $index }}
+                                </td>
 
-                                <!-- Nama User Peminjam -->
                                 <td class="px-4 py-3 border font-semibold text-slate-800">
                                     {{ $item->username ?? ($item->user->username ?? '-') }}
                                 </td>
 
-                                <!-- Nama Alat & Jumlah -->
                                 <td class="px-4 py-3 border">
                                     {{ $item->nama_alat ?? ($item->alat->nama_alat ?? '-') }} ({{ $item->jumlah }} Unit)
                                 </td>
 
-                                <!-- Format Tanggal Pinjam -->
                                 <td class="px-4 py-3 border">
                                     {{ \Carbon\Carbon::parse($item->tanggal_pinjam)->locale('id')->isoFormat('D MMM YYYY, HH:mm') }}
                                     WIB
                                 </td>
 
-                                <!-- Format Tanggal Kembali -->
                                 <td class="px-4 py-3 border">
                                     {{ $item->tanggal_kembali ? \Carbon\Carbon::parse($item->tanggal_kembali)->locale('id')->isoFormat('D MMM YYYY, HH:mm') . ' WIB' : '-' }}
                                 </td>
 
-                                <!-- Badge Status -->
                                 <td class="px-4 py-3 border text-center uppercase font-bold text-[10px]">
                                     {{ str_replace('_', ' ', $item->status) }}
                                 </td>
                             </tr>
                         @empty
-                            <!-- Tampilan jika tidak ada data ditemukan -->
                             <tr>
                                 <td colspan="6" class="px-4 py-6 border text-center text-slate-400">
                                     Data laporan tidak ditemukan pada rentang tanggal ini.
@@ -171,6 +171,11 @@
 
                     </tbody>
                 </table>
+            </div>
+
+            <!-- AREA PAGINATION (10 Data Per Halaman) -->
+            <div class="pt-4 no-print">
+                {{ $laporan->links() }}
             </div>
 
             <!-- Kolom Tanda Tangan (Muncul hanya saat Print) -->

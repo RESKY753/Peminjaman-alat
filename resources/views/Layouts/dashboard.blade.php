@@ -157,7 +157,7 @@
                             class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold transition">
                             Lihat Katalog & Pinjam Alat
                         </a>
-                        <a href="{{ url('/peminjam/pinjaman/' . auth()->id()) }}"
+                        <a href="{{ url('/peminjam/pinjaman/') }}"
                             class="px-4 py-2 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 transition">
                             Status Pinjaman Saya
                         </a>

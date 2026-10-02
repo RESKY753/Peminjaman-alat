@@ -63,7 +63,8 @@
                 </div>
             @endif
             <!-- Form Pengajuan -->
-            <form action="{{ url('/peminjam/pinjam/store') }}" method="POST" class="space-y-4">
+            <form action="{{ url('/peminjam/pinjam/store') }}" method="POST" class="space-y-4"
+                onsubmit="this.querySelector('button[type=submit]').disabled = true;">
                 @csrf
                 <input type="hidden" name="id_alat" value="{{ $alat->id_alat }}">
                 <input type="hidden" name="tanggal_pinjam" value="{{ now()->toDateString() }}">
@@ -77,16 +78,7 @@
                     <p class="text-[10px] text-slate-400 mt-1">*Maksimal peminjaman {{ $alat->stok }} unit sesuai
                         ketersediaan stok.</p>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Jaminan</label>
-                    <select name="jaminan" required
-                        class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
-                        <option value="" disabled selected>Pilih Jaminan</option>
-                        <option value="tidak ada jaminan">Tanpa Jaminan</option>
-                        <option value="KTP">KTP</option>
-                        <option value="SIM">SIM</option>
-                    </select>
-                </div>
+
 
                 <!-- Input Tanggal Rencana Kembali -->
                 <div>

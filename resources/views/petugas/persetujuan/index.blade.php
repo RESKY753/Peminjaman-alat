@@ -18,15 +18,14 @@
                 </button>
             </div>
         @endif
-        <!-- Flash Message Success -->
         @if (session('error'))
             <div
-                class="bg-danger-500/10 border border-danger-500/30 text-danger-400 text-sm p-4 rounded-xl flex items-center justify-between">
+                class="my-4 bg-rose-500/10 border border-rose-500/30 text-rose-400 text-sm p-4 rounded-xl flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <i class="fas fa-check-circle"></i>
-                    <span>{{ session('success') }}</span>
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>{{ session('error') }}</span>
                 </div>
-                <button onclick="this.parentElement.remove()" class="text-danger-400 hover:text-danger-200">
+                <button onclick="this.parentElement.remove()" class="text-rose-400 hover:text-rose-200">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -130,6 +129,13 @@
                                             </span>
                                         @break
 
+                                        @case('pengembalian ditolak')
+                                            <span
+                                                class="px-2.5 py-1 bg-rose-50 text-rose-600 border border-rose-100 rounded-md text-xs font-semibold uppercase">
+                                                Ditolak
+                                            </span>
+                                        @break
+
                                         @default
                                             <span
                                                 class="px-2.5 py-1 bg-slate-50 text-slate-600 border border-slate-200 rounded-md text-xs font-semibold uppercase">
@@ -159,17 +165,13 @@
                                                 </form>
 
                                                 <!-- Form Tolak -> value ditolak -->
-                                                <form action="{{ url('/petugas/persetujuan/update/' . $idPeminjaman) }}"
-                                                    method="POST" class="inline">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <input type="hidden" name="status" value="ditolak">
-                                                    <button type="submit" onclick="return confirm('Tolak peminjaman alat ini?')"
-                                                        class="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-semibold hover:bg-rose-700 transition flex items-center space-x-1 shadow-sm">
-                                                        <i class="fa-solid fa-xmark"></i>
-                                                        <span>Tolak</span>
-                                                    </button>
-                                                </form>
+                                                <!-- Form Tolak -> Memicu Modal Alasan -->
+                                                <button type="button"
+                                                    onclick="bukaModalTolak('{{ url('/petugas/persetujuan/update/' . $idPeminjaman) }}', 'ditolak')"
+                                                    class="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-semibold hover:bg-rose-700 transition flex items-center space-x-1 shadow-sm">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                    <span>Tolak</span>
+                                                </button>
                                             @break
 
                                             {{-- 2. Status 'dipinjam': Kosong / Tidak ada tombol aksi --}}
@@ -192,12 +194,20 @@
                                                         <span>Setujui Pengembalian</span>
                                                     </button>
                                                 </form>
+                                                <!-- Form Tolak -> Memicu Modal Alasan -->
+                                                <button type="button"
+                                                    onclick="bukaModalTolak('{{ url('/petugas/persetujuan/update/' . $idPeminjaman) }}', 'pengembalian ditolak')"
+                                                    class="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-semibold hover:bg-rose-700 transition flex items-center space-x-1 shadow-sm">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                    <span>Tolak</span>
+                                                </button>
                                             @break
 
                                             {{-- 4. Status Lain (dikembalikan/ditolak/selesai): Tampilan netral --}}
 
                                             @default
-                                                <span class="text-xs text-slate-400 font-medium italic">- Selesai -</span>
+                                                <span class="text-xs text-slate-400 font-medium italic">- Pengembalian ditolak
+                                                    -</span>
                                         @endswitch
 
                                     </div>
@@ -216,4 +226,61 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal Pop-Up Alasan Penolakan -->
+        <div id="modalTolak" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden">
+            <div class="bg-white w-full max-w-md p-6 rounded-2xl shadow-xl space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-slate-800">Alasan Penolakan</h3>
+                    <button onclick="tutupModalTolak()" class="text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Form yang akan dikirim ke Controller -->
+                <form id="formTolak" method="POST" class="space-y-4">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="status" id="statusInput" value="">
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Masukkan alasan penolakan:</label>
+                        <textarea name="alasan" rows="4" required
+                            class="w-full text-sm border border-slate-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                            placeholder="Contoh: Stok alat habis / Jaminan tidak valid..."></textarea>
+                    </div>
+
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" onclick="tutupModalTolak()"
+                            class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-200 transition">
+                            Batal
+                        </button>
+                        <button type="submit"
+                            class="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-semibold hover:bg-rose-700 transition">
+                            Kirim Penolakan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- JavaScript untuk Mengontrol Modal -->
+        <!-- JavaScript untuk Mengontrol Modal -->
+        <script>
+            function bukaModalTolak(urlAction, statusValue) {
+                const modal = document.getElementById('modalTolak');
+                const form = document.getElementById('formTolak');
+                const statusInput = document.getElementById('statusInput');
+
+                form.action = urlAction; // Set URL action form sesuai ID peminjaman
+                statusInput.value = statusValue; // Masukkan value ('ditolak' atau 'pengembalian ditolak') ke input hidden
+
+                modal.classList.remove('hidden'); // Tampilkan modal
+            }
+
+            function tutupModalTolak() {
+                const modal = document.getElementById('modalTolak');
+                modal.classList.add('hidden'); // Sembunyikan modal
+            }
+        </script>
     @endsection

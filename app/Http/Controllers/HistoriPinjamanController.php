@@ -4,31 +4,34 @@ namespace App\Http\Controllers;
 
 use App\Models\HistoriPinjaman;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class HistoriPinjamanController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index($id)
+    public function index()
     {
+        $id = Auth::user()->id_user;
         $histori = HistoriPinjaman::with(['peminjaman.alat'])
             ->whereHas('peminjaman', function ($query) use ($id) {
                 $query->where('id_user', $id);
             })
             ->whereIn('status_akhir', ['dikembalikan', 'ditolak'])
-            ->orderBy('creted_at','desc')
+            ->orderBy('created_at','desc')
             ->get();
         return view('peminjam.histori.index', compact('histori'));
     }
-    public function indexAdmin($id)
+    public function indexAdmin()
     {
+        $id = Auth::user()->id_user;
         $histori = HistoriPinjaman::with(['peminjaman.alat'])
             ->whereHas('peminjaman', function ($query) use ($id) {
                 $query->where('id_user', $id);
             })
             ->whereIn('status_akhir', ['dikembalikan', 'ditolak'])
-            ->orderBy('creted_at','desc')
+            ->orderBy('created_at','desc')
             ->get();
         return view('admin.histori.index', compact('histori'));
     }

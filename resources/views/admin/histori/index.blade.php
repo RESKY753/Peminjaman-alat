@@ -38,15 +38,14 @@
                                     <div
                                         class="w-9 h-9 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden flex-shrink-0">
                                         <img src="{{ asset('uploads/alat/' . $item->peminjaman->alat->foto) }}"
-                                            alt="{{ $item->peminjaman->alat->namaAlat }}"
-                                            class="w-full h-full object-cover">
+                                            alt="{{ $item->peminjaman->alat->namaAlat }}" class="w-full h-full object-cover">
                                     </div>
                                     <span>{{ $item->peminjaman->alat->nama_alat }}</span>
                                 </td>
                                 <td class="py-4 px-6">{{ $item->peminjaman->jumlah . 'Unit' }}</td>
                                 <td class="py-4 px-6">{{ $item->peminjaman->jaminan }}</td>
                                 <td class="py-4 px-6 text-slate-500">{{ $item->peminjaman->tanggal_pinjam }}</td>
-                                <td class="py-4 px-6 text-slate-500">{{ $item->creted_at }}</td>
+                                <td class="py-4 px-6 text-slate-500">{{ $item->created_at }}</td>
                                 <td class="py-4 px-6">
                                     @if ($item->status_akhir == 'dikembalikan')
                                         <span

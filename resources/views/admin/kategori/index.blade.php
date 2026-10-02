@@ -40,6 +40,7 @@
                             <th class="px-6 py-3.5">ID</th>
                             <th class="px-6 py-3.5">Nama Kategori</th>
                             <th class="px-6 py-3.5">Keterangan</th>
+                            <th class="px-6 py-3.5">Status</th>
                             <th class="px-6 py-3.5 text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -47,11 +48,29 @@
 
                         <!-- Row 1 -->
                         @forelse ($kategori as $kat)
-                            <tr class="hover:bg-slate-50/80 transition">
+                            @php
+                                $isFalse = strtolower($kat->status_aktif) === 'false';
+                            @endphp
+                            <tr
+                                class="transition {{ $isFalse ? 'bg-slate-100/80 text-slate-400' : 'hover:bg-slate-50/80' }}">
                                 <td class="px-6 py-4 font-bold text-slate-400 text-xs">#KTG-0{{ $kat->id_kategori }}</td>
                                 <td class="px-6 py-4 font-bold text-slate-800">{{ ucfirst($kat->nama_kategori) }}</td>
                                 <td class="px-6 py-4 text-xs text-slate-500">{{ $kat->keterangan }}
                                 </td>
+                                <td class="px-6 py-4">
+                                    @if ($isFalse)
+                                        <span
+                                            class="px-2.5 py-1 bg-rose-100 text-rose-700 rounded-md text-xs font-bold border border-rose-300 uppercase tracking-wider">
+                                            Nonaktif
+                                        </span>
+                                    @else
+                                        <span
+                                            class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-md text-xs font-semibold border border-emerald-200 uppercase tracking-wider">
+                                            Aktif
+                                        </span>
+                                    @endif
+                                </td>
+
                                 <td class="px-6 py-4 text-center">
                                     <div class="flex items-center justify-center space-x-2">
                                         <button
@@ -60,17 +79,33 @@
                                             title="Edit Kategori">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </button>
-                                        <form action="/admin/kategori/delete/{{ $kat->id_kategori }}" method="POST"
-                                            onsubmit="return confirm('Apakah kamu yakin ingin menghapus kategori {{ $kat->nama_kategori }}?')"
-                                            class="inline">
-                                            @csrf
-
-                                            <button type="submit"
-                                                class="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition"
-                                                title="Hapus Kategori">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        <!-- Form Toggle Nonaktif / Pulihkan -->
+                                        @if ($isFalse)
+                                            <form action="{{ url('/admin/kategori/pulihkan/' . $kat->id_kategori) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('Apakah kamu yakin ingin memulihkan kategori ini?')"
+                                                class="inline">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg text-xs font-semibold transition flex items-center space-x-1"
+                                                    title="Pulihkan Alat">
+                                                    <i class="fa-solid fa-rotate-left"></i>
+                                                    <span>Pulihkan</span>
+                                                </button>
+                                            </form>
+                                        @else
+                                            <form action="{{ url('/admin/kategori/nonaktif/' . $kat->id_kategori) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('Apakah kamu yakin ingin menonaktifkan kategori ini?')"
+                                                class="inline">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition"
+                                                    title="Nonaktifkan Alat">
+                                                    <i class="fa-solid fa-ban"></i>
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -114,7 +149,8 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Kategori</label>
                         <input type="text" name="nama_kategori" x-model="namaKategori" required
-                            placeholder="Contoh: Elektronik, Perkakas..."
+                            oninvalid="this.setCustomValidity('Nama kategori wajib diisi!')"
+                            oninput="this.setCustomValidity('')" placeholder="Contoh: Elektronik, Perkakas..."
                             class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         {{-- @error('nama_kategori')
                                 <div class="text-danger small mt-1 fw-bold">{{ $message }}</div>
@@ -125,6 +161,7 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Keterangan (Opsional)</label>
                         <textarea rows="3" name="keterangan" x-model="keterangan" required
+                            oninvalid="this.setCustomValidity('Keterangan wajib diisi!')" oninput="this.setCustomValidity('')"
                             placeholder="Penjelasan singkat mengenai kategori ini..."
                             class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
                         {{-- @error('keterangan')

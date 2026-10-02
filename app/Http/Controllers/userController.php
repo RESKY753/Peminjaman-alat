@@ -27,13 +27,13 @@ class userController extends Controller
         $myPinjamanCount = Peminjaman::where('id_user', Auth::user()->id_user)
             ->whereNotIn('status', ['dikembalikan', 'ditolak'])
             ->count();
-        $katalogCount = Alat::where('stok', '>', 0)->count();
+        $katalogCount = Alat::where('stok', '>', 0)->whereNotIn('status_alat', ['false'])->count();
 
-        $pendingCount = Peminjaman::whereNotIn('status', ['dikembalikan', 'dipinjam', 'ditolak'])->count();
+        $pendingCount = Peminjaman::whereNotIn('status', ['dikembalikan', 'dipinjam', 'ditolak','pengembalian ditolak'])->count();
         $activePinjamCount = Peminjaman::where('status', ['dipinjam'])->count();
         $totalPeminjam = Peminjaman::whereNotIn('status', ['ditolak', 'dikembalikan'])->count();
 
-        return view('Layouts.dashboard', compact('totalAlat', 'totalUser', 'totalKategori', 'totalLog', 'myPinjamanCount', 'katalogCount', 'pendingCount','activePinjamCount', 'totalPeminjam'));
+        return view('Layouts.dashboard', compact('totalAlat', 'totalUser', 'totalKategori', 'totalLog', 'myPinjamanCount', 'katalogCount', 'pendingCount', 'activePinjamCount', 'totalPeminjam'));
         return view('Layouts.dashboard');
     }
     public function index()
@@ -61,19 +61,27 @@ class userController extends Controller
         ];
 
         // 3. Coba Autentikasi
+        // 3. Coba Autentikasi
         if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
             $user = Auth::user();
 
-            LogAktivitas::catat('Login', 'User ' . $user->username . ' berhasil login' . $user->id_user);
+            // Cek apakah user di-blacklist (status_aktif bukan 'true' atau bernilai 'blacklist')
+            if ($user->status_aktif !== 'true') {
+                // Keluarkan / logout kembali user yang terlanjur login
+                Auth::logout();
 
-            // cek sudah ada sesion apa belum
-            if (Auth::check()) {
-                return redirect()->route('dashboard');
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return redirect()->to('/')->with('error', 'Akun anda di-blacklist atau dinonaktifkan.');
             }
 
-            //jika tidak ada session kode ini akan dijalankan
-            return redirect()->to('/');
+            // Jika aktif ('true'), lanjutkan proses login normal
+            $request->session()->regenerate();
+
+            LogAktivitas::catat('Login', 'User ' . $user->username . ' berhasil login ' . $user->id_user);
+
+            return redirect()->route('dashboard');
         }
 
         // Jika Gagal
@@ -106,9 +114,19 @@ class userController extends Controller
             LogAktivitas::catat('Mencari pengguna berdasarkan role', 'User ' . $user->username . ' berhasil mencari role');
         }
 
-        // 3. Batasi 15 Data Per Halaman & Simpan Query Parameter saat Pindah Halaman
-        $user = $query->latest('id_user')->paginate(15)->withQueryString();
+        // filter berdasarkan status
+        if ($request->filled('status_aktif')) {
+            $query->where('status_aktif', $request->status_aktif);
 
+            $user = Auth::user();
+
+            // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+            LogAktivitas::catat('Mencari pengguna berdasarkan status akun', 'User ' . $user->username . ' berhasil mencari status');
+        }
+
+        // 3. Batasi 15 Data Per Halaman & Simpan Query Parameter saat Pindah Halaman
+        //mengurutkan dari status aktif dan blacklist
+        $user = $query->orderByRaw("FIELD(status_aktif, 'true', 'blacklist') ASC")->orderBy('username', 'ASC')->latest('id_user')->paginate(15)->withQueryString();
         return view('admin.user.index', compact('user'));
     }
 
@@ -204,18 +222,17 @@ class userController extends Controller
     public function destroy($id)
     {
         // try {
-            // 1. Cari user yang mau dihapus & simpan namanya sebelum hilang
-            $targetUser = User::with('peminjaman')->findOrFail($id);
-            $namaTarget = $targetUser->username;
-            $masihDipinjam = $targetUser->peminjaman()
-            ->whereIn('status', ['dipinjam','ajukan kembali'])
+        // 1. Cari user yang mau dihapus & simpan namanya sebelum hilang
+        $targetUser = User::with('peminjaman')->findOrFail($id);
+        $namaTarget = $targetUser->username;
+        $masihDipinjam = $targetUser
+            ->peminjaman()
+            ->whereIn('status', ['dipinjam', 'ajukan kembali'])
             ->exists();
 
-           
-
-            if ($masihDipinjam) {
-                 return redirect()->back()->with('error','User tidak bisa di hapus karena masih meminjam alat');
-            }else{
+        if ($masihDipinjam) {
+            return redirect()->back()->with('error', 'User tidak bisa di hapus karena masih meminjam alat');
+        } else {
             // 2. Eksekusi hapus user
             $targetUser->delete();
 
@@ -226,16 +243,43 @@ class userController extends Controller
             LogAktivitas::catat('Menghapus User', 'Admin ' . $admin->username . ' menghapus user ' . $namaTarget);
 
             return redirect()->back()->with('success', 'User berhasil dihapus.');
-            }
-        // } catch (QueryException $e) {
-        //     // 5. TANGKAP ERROR RESTRICT DI SINI (SQLSTATE 23000)
-        //     if ($e->getCode() == '23000') {
-        //         return redirect()->back()->with('error', 'User tidak bisa dihapus karena masih memiliki riwayat transaksi atau log aktivitas!');
-        //     }
+        }
+    }
 
-        //     // Kalau ada error database lainnya
-        //     return redirect()->back()->with('error', 'Gagal menghapus user dari database.');
-        // }
+    function blacklistUser($id)
+    {
+        // 1. Cari user yang mau dihapus & simpan namanya sebelum hilang
+        $targetUser = User::with('peminjaman')->findOrFail($id);
+        $namaTarget = $targetUser->username;
+        $masihDipinjam = $targetUser
+            ->peminjaman()
+            ->whereIn('status', ['dipinjam', 'ajukan kembali'])
+            ->exists();
+
+        if ($masihDipinjam) {
+            return redirect()->back()->with('error', 'User tidak bisa di blacklist karena masih meminjam alat');
+        } else {
+            $user = ['status_aktif' => 'blacklist'];
+            // 2. Eksekusi hapus user
+            $targetUser->update($user);
+
+            // 3. Ambil data admin yang sedang login
+            $admin = Auth::user();
+
+            // 4. Catat ke log aktivitas (Hanya jalan kalau hapus BERHASIL)
+            LogAktivitas::catat('Menghapus User', 'Admin ' . $admin->username . ' mengblacklist user ' . $namaTarget);
+
+            return redirect()->back()->with('success', 'User berhasil diblacklist.');
+        }
+    }
+
+    function PulihkanUser($id)
+    {
+        $targetUser = User::findOrFail($id);
+
+        $targetUser->update(['status_aktif' => 'true']);
+
+        return redirect()->back()->with('success', 'user berhasil dipulihkan');
     }
 
     function logout(Request $request)

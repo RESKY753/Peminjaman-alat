@@ -83,13 +83,13 @@
                                 Katalog Alat
                             </a>
 
-                            <a href="{{ url('/admin/pinjaman/' . auth()->id()) }}"
+                            <a href="{{ url('/admin/pinjaman')}}"
                                 class="flex items-center px-3 py-2 rounded-lg transition text-sm font-medium {{ request()->is('admin/pinjaman*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
                                 <i
                                     class="fa-solid fa-hand-holding w-6 {{ request()->is('admin/pinjaman*') ? 'text-white' : 'text-slate-500' }}"></i>
                                 Pinjaman Saya
                             </a>
-                            <a href="{{ url('/admin/histori/' . auth()->id()) }}"
+                            <a href="{{ url('/admin/histori') }}"
                                 class="flex items-center px-3 py-2 rounded-lg transition text-sm font-medium {{ request()->is('admin/histori*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
                                 <i
                                     class="fa-solid fa-clock-rotate-left w-6 {{ request()->is('admin/histori*') ? 'text-white' : 'text-slate-500' }}"></i>
@@ -138,13 +138,13 @@
                             Katalog Alat
                         </a>
 
-                        <a href="{{ url('/peminjam/pinjaman/' . auth()->id()) }}"
+                        <a href="{{ url('/peminjam/pinjaman')}}"
                             class="flex items-center px-3 py-2 rounded-lg transition text-sm font-medium {{ request()->is('peminjam/pinjaman*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
                             <i
                                 class="fa-solid fa-hand-holding w-6 {{ request()->is('peminjam/pinjaman*') ? 'text-white' : 'text-slate-500' }}"></i>
                             Pinjaman Saya
                         </a>
-                        <a href="{{ url('/peminjam/histori/' . auth()->id()) }}"
+                        <a href="{{ url('/peminjam/histori')}}"
                             class="flex items-center px-3 py-2 rounded-lg transition text-sm font-medium {{ request()->is('peminjam/histori*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
                             <i
                                 class="fa-solid fa-clock-rotate-left w-6 {{ request()->is('peminjam/histori*') ? 'text-white' : 'text-slate-500' }}"></i>

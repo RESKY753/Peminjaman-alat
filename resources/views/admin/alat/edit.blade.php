@@ -15,7 +15,7 @@
 
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
             <form action="{{ url('/admin/alat/update/' . $alat->id_alat) }}" method="POST" enctype="multipart/form-data"
-                class="space-y-4">
+                class="space-y-4" onsubmit="this.querySelector('button[type=submit]').disabled = true;">
                 @csrf
                 @method('PUT')
 

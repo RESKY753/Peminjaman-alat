@@ -19,7 +19,7 @@ return new class extends Migration
             // Data Khusus Riwayat (Yang tidak ada / berubah dari tabel peminjaman awal)
             $table->enum('status_akhir', ['dikembalikan', 'ditolak']);
 
-            $table->timestamp('creted_at');
+            $table->timestamp('created_at');
         });
     }
 

@@ -14,7 +14,7 @@
         </div>
 
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-            <form action="{{ url('/admin/user/store') }}" method="POST" class="space-y-4">
+            <form action="{{ url('/admin/user/store') }}" method="POST" class="space-y-4" onsubmit="this.querySelector('button[type=submit]').disabled = true;">
                 @csrf
 
                 <!-- Username -->

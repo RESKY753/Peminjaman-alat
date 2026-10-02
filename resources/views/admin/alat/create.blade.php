@@ -15,13 +15,13 @@
         </div>
 
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-            <form action="{{ url('/admin/alat/store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <form action="{{ url('/admin/alat/store') }}" method="POST" enctype="multipart/form-data" class="space-y-4" onsubmit="this.querySelector('button[type=submit]').disabled = true;">
                 @csrf
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Alat</label>
                     <input type="text" placeholder="Masukkan nama alat..." name="nama_alat"
-                        value="{{ old('nama_alat') }}" required
+                        value="{{ old('nama_alat') }}" 
                         class="w-full px-3 py-2 border @error('nama_alat') border-rose-500 ring-1 ring-rose-500 @else border-slate-200 @enderror rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     @error('nama_alat')
                         <span class="text-[10px] text-rose-500 mt-1 block">{{ $message }}</span>
@@ -32,7 +32,7 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Kategori</label>
-                        <select name="id_kategori" required
+                        <select name="id_kategori"
                             class="w-full px-3 py-2 border @error('id_kategori') border-rose-500 @else border-slate-200 @enderror rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
                             <option value="">Pilih Kategori</option>
                             @foreach ($kategori as $data)
@@ -49,7 +49,7 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Jumlah Stok</label>
                         <input type="number" min="0" placeholder="Contoh: 5" name="stok"
-                            value="{{ old('stok') }}" required
+                            value="{{ old('stok') }}"
                             class="w-full px-3 py-2 border @error('stok') border-rose-500 @else border-slate-200 @enderror rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         @error('stok')
                             <span class="text-[10px] text-rose-500 mt-1 block">{{ $message }}</span>
@@ -60,7 +60,7 @@
                 <!-- Kondisi Alat -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Kondisi Alat</label>
-                    <select name="kondisi" required
+                    <select name="kondisi"
                         class="w-full px-3 py-2 border @error('kondisi') border-rose-500 @else border-slate-200 @enderror rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
                         <option value="baru" {{ old('kondisi') == 'baru' ? 'selected' : '' }}>Baru</option>
                         <option value="rusak_ringan" {{ old('kondisi') == 'rusak_ringan' ? 'selected' : '' }}>Rusak Ringan
@@ -76,7 +76,7 @@
                 <!-- Spesifikasi -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Spesifikasi</label>
-                    <textarea rows="3" placeholder="Tuliskan spesifikasi detail alat..." name="spesifikasi" required
+                    <textarea rows="3" placeholder="Tuliskan spesifikasi detail alat..." name="spesifikasi"
                         class="w-full px-3 py-2 border @error('spesifikasi') border-rose-500 @else border-slate-200 @enderror rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('spesifikasi') }}</textarea>
                     @error('spesifikasi')
                         <span class="text-[10px] text-rose-500 mt-1 block">{{ $message }}</span>
@@ -86,7 +86,7 @@
                 <!-- Upload Foto -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Upload Foto Alat</label>
-                    <input type="file" name="foto" required
+                    <input type="file" name="foto"
                         class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
                     @error('foto')
                         <span class="text-[10px] text-rose-500 mt-1 block">{{ $message }}</span>

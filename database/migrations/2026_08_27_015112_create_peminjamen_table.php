@@ -18,7 +18,7 @@ return new class extends Migration
 
             $table->foreign('id_user')->references('id_user')->on('users')->onDelete('cascade');
             $table->foreign('id_alat')->references('id_alat')->on('alat')->onDelete('cascade');
-            $table->enum('status', ['ajukan peminjaman', 'dipinjam', 'ajukan kembali', 'dikembalikan', 'ditolak']);
+            $table->enum('status', ['ajukan peminjaman', 'dipinjam', 'ajukan kembali', 'dikembalikan', 'ditolak', 'pengembalian ditolak']);
             $table->enum('jaminan', ['tidak ada jaminan', 'KTP', 'SIM']);
             $table->integer('jumlah')->nullable();
             $table->timestamp('tanggal_pinjam')->useCurrent();

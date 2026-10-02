@@ -15,7 +15,7 @@ class KategoriController extends Controller
      */
     public function index()
     {
-        $kategori = Kategori::all();
+        $kategori = Kategori::orderByRaw("FIELD(status_aktif, 'true', 'false')ASC")->get();
         return view('admin.kategori.index', compact('kategori'));
     }
 
@@ -101,5 +101,33 @@ class KategoriController extends Controller
         LogAktivitas::catat('Menghapus kategori', $user->username . ', Menghapus kategori:'. ' KTG-0'.$id);
 
         return redirect()->back()->with('success', 'Kategori berhasil dihapus');
+    }
+
+    function nonAktif($id){
+        $kategori = Kategori::findOrFail($id);
+
+        $kategori->update(['status_aktif' => 'false']);
+
+         $user = Auth::user();
+
+        // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+        LogAktivitas::catat('Menonaktifkan kategori', $user->username . ', Menonaktifkan kategori:'. ' KTG-0'.$id);
+
+        return redirect()->back()->with('success','kategori berhasil dinonaktifkan');
+
+    }
+
+    function aktif($id){
+        $kategori = Kategori::findOrFail($id);
+
+        $kategori->update(['status_aktif' => 'true']);
+
+         $user = Auth::user();
+
+        // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
+        LogAktivitas::catat('Mengaktifkan kategori', $user->username . ', Mengaktifkan kategori:'. ' KTG-0'.$id);
+
+        return redirect()->back()->with('success','kategori berhasil diaktifkan');
+
     }
 }

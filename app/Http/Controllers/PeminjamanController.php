@@ -31,8 +31,8 @@ class PeminjamanController extends Controller
         $persetujuan = DB::table('peminjaman')
             ->join('users', 'peminjaman.id_user', '=', 'users.id_user')
             ->join('alat', 'peminjaman.id_alat', '=', 'alat.id_alat')
-            ->select('peminjaman.id_peminjaman', 'peminjaman.jumlah','peminjaman.jaminan' , 'users.username', 'alat.nama_alat', 'peminjaman.tanggal_pinjam', 'peminjaman.tanggal_kembali', 'peminjaman.status')
-            ->whereIn('status', ['ajukan peminjaman', 'dipinjam', 'ajukan kembali'])
+            ->select('peminjaman.id_peminjaman', 'peminjaman.jumlah', 'peminjaman.jaminan', 'users.username', 'alat.nama_alat', 'peminjaman.tanggal_pinjam', 'peminjaman.tanggal_kembali', 'peminjaman.status')
+            ->whereIn('status', ['ajukan peminjaman', 'dipinjam', 'ajukan kembali', 'pengembalian ditolak'])
             ->orderBy('peminjaman.tanggal_kembali', 'asc')
             ->get();
         return view('petugas.persetujuan.index', compact('persetujuan'));
@@ -95,12 +95,17 @@ class PeminjamanController extends Controller
      */
     public function create($id)
     {
-        $alat = Alat::join('kategori', 'alat.id_kategori', '=', 'kategori.id_kategori')
-            ->select('alat.id_alat', 'alat.nama_alat', 'alat.foto', 'alat.spesifikasi', 'alat.stok', 'alat.kondisi', 'kategori.nama_kategori')
-            ->where('alat.id_alat', $id) // Where dipanggil DULUAN untuk memfilter ID
-            ->first(); // Executed paling akhir untuk ambil 1 data
+        $alat = Alat::findOrFail($id);
+        if ($alat->status_alat == 'false') {
+            return redirect('/peminjam/katalog')->with('error', 'alat tidak ada');
+        } else {
+            $alat = Alat::join('kategori', 'alat.id_kategori', '=', 'kategori.id_kategori')
+                ->select('alat.id_alat', 'alat.nama_alat', 'alat.foto', 'alat.spesifikasi', 'alat.stok', 'alat.kondisi', 'kategori.nama_kategori')
+                ->where('alat.id_alat', $id) // Where dipanggil DULUAN untuk memfilter ID
+                ->first(); // Executed paling akhir untuk ambil 1 data
 
-        return view('peminjam.pinjam.create', compact('alat'));
+            return view('peminjam.pinjam.create', compact('alat'));
+        }
     }
     public function createAdmin($id)
     {
@@ -122,7 +127,6 @@ class PeminjamanController extends Controller
         $request->validate([
             'id_alat' => 'required',
             'jumlah' => 'required',
-            'jaminan' => 'required',
             'tanggal_pinjam' => 'required',
             'tanggal_kembali' => 'required',
         ]);
@@ -139,15 +143,14 @@ class PeminjamanController extends Controller
             'id_alat' => $request->id_alat,
             'id_user' => $id_user,
             'jumlah' => $request->jumlah,
-            'jaminan' => $request->jaminan,
+            'jaminan' => 'tidak ada jaminan',
             'tanggal_pinjam' => $request->tanggal_pinjam,
             'tanggal_kembali' => $request->tanggal_kembali,
         ]);
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Mengajukan peminjaman', $user->username . ', Mengajukan Peminjaman:'. ' ALT-0'.$request->id_alat);
-        
+        LogAktivitas::catat('Mengajukan peminjaman', $user->username . ', Mengajukan Peminjaman:' . ' ALT-0' . $request->id_alat);
 
         return redirect('/peminjam/katalog')->with('success', 'Pengajuan berhasil ditambahkan');
     }
@@ -162,7 +165,6 @@ class PeminjamanController extends Controller
             'tanggal_kembali' => 'required',
         ]);
 
-
         Peminjaman::create([
             'id_alat' => $request->id_alat,
             'id_user' => $id_user,
@@ -173,7 +175,7 @@ class PeminjamanController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Mengajukan peminjaman', $user->username . ', Mengajukan Peminjaman:'.' ALT-0'. $request->id_alat);
+        LogAktivitas::catat('Mengajukan peminjaman', $user->username . ', Mengajukan Peminjaman:' . ' ALT-0' . $request->id_alat);
 
         return redirect('/admin/katalog')->with('success', 'Pengajuan berhasil ditambahkan');
     }
@@ -181,15 +183,27 @@ class PeminjamanController extends Controller
     /**
      * Display the specified resource.
      */
-    public function pinjamanSaya($id)
+    public function pinjamanSaya()
     {
-        $pinjamanSaya = DB::table('peminjaman')->join('alat', 'peminjaman.id_alat', '=', 'alat.id_alat')->select('alat.nama_alat', 'alat.foto', 'peminjaman.id_peminjaman', 'peminjaman.status', 'peminjaman.jumlah', 'peminjaman.tanggal_pinjam', 'peminjaman.tanggal_kembali')->whereNotIn('peminjaman.status', ['dikembalikan', 'ditolak'])->where('id_user', $id)->get();
+        $user = Auth::user();
+        $pinjamanSaya = DB::table('peminjaman')
+            ->join('alat', 'peminjaman.id_alat', '=', 'alat.id_alat')
+            ->select('alat.nama_alat', 'alat.foto', 'peminjaman.id_peminjaman', 'peminjaman.status', 'peminjaman.jumlah', 'peminjaman.tanggal_pinjam', 'peminjaman.tanggal_kembali', 'peminjaman.alasan')
+            ->whereNotIn('peminjaman.status', ['dikembalikan', 'ditolak'])
+            ->where('id_user', $user->id_user)
+            ->get();
 
         return view('peminjam.pinjaman', compact('pinjamanSaya'));
     }
-    public function pinjamanSayaAdmin($id)
+    public function pinjamanSayaAdmin()
     {
-        $pinjamanSaya = DB::table('peminjaman')->join('alat', 'peminjaman.id_alat', '=', 'alat.id_alat')->select('alat.nama_alat', 'alat.foto', 'peminjaman.id_peminjaman', 'peminjaman.status', 'peminjaman.jumlah', 'peminjaman.tanggal_pinjam', 'peminjaman.tanggal_kembali')->whereNotIn('peminjaman.status', ['dikembalikan', 'ditolak'])->where('id_user', $id)->get();
+        $user = Auth::user();
+        $pinjamanSaya = DB::table('peminjaman')
+            ->join('alat', 'peminjaman.id_alat', '=', 'alat.id_alat')
+            ->select('alat.nama_alat', 'alat.foto', 'peminjaman.id_peminjaman', 'peminjaman.status', 'peminjaman.jumlah', 'peminjaman.tanggal_pinjam', 'peminjaman.tanggal_kembali', 'peminjaman.alasan')
+            ->whereNotIn('peminjaman.status', ['dikembalikan', 'ditolak'])
+            ->where('id_user', $user->id_user)
+            ->get();
 
         return view('admin.pinjaman', compact('pinjamanSaya'));
     }
@@ -212,6 +226,7 @@ class PeminjamanController extends Controller
 
         $statusLama = $peminjaman->status;
         $statusBaru = $request->status;
+        $alasan = $request->alasan;
 
         // 2. Ambil data alat terkait
         $alat = Alat::findOrFail($peminjaman->id_alat);
@@ -226,14 +241,14 @@ class PeminjamanController extends Controller
                 $user = Auth::user();
 
                 // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-                LogAktivitas::catat('Menolak Peminjaman', $user->username . ', Menolak peminjaman karena stok habis'. $id);
+                LogAktivitas::catat('Menolak Peminjaman', $user->username . ', Menolak peminjaman karena stok habis' . $id);
                 return redirect()->back()->with('error', 'Stok alat tidak mencukupi untuk disetujui!');
             }
 
             $user = Auth::user();
 
             // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-            LogAktivitas::catat('Menyetujui Peminjaman', $user->username . ', Menyetujui peminjaman:'. $id);
+            LogAktivitas::catat('Menyetujui Peminjaman', $user->username . ', Menyetujui peminjaman:' . $id);
 
             // KURANGI STOK
             $alat->decrement('stok', $peminjaman->jumlah);
@@ -246,29 +261,30 @@ class PeminjamanController extends Controller
             HistoriPinjaman::create([
                 'id_peminjaman' => $peminjaman->id_peminjaman,
                 'status_akhir' => $statusBaru,
-                'creted_at' => now(),
+                'created_at' => now(),
             ]);
 
             $user = Auth::user();
 
             // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-            LogAktivitas::catat('Menyetujui pengembalian', $user->username . ', Menyetujui pengembalian:'. $id);
-        }else{
-               $user = Auth::user();
+            LogAktivitas::catat('Menyetujui pengembalian', $user->username . ', Menyetujui pengembalian:' . $id);
+        } else {
+            $user = Auth::user();
 
             // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-            LogAktivitas::catat('Menolak peminjaman', $user->username . ', Menolak peminjaman:'. $id);
+            LogAktivitas::catat('Menolak peminjaman', $user->username . ', Menolak peminjaman:' . $id);
 
-             HistoriPinjaman::create([
+            HistoriPinjaman::create([
                 'id_peminjaman' => $peminjaman->id_peminjaman,
                 'status_akhir' => 'ditolak',
-                'creted_at' => now(),
+                'created_at' => now(),
             ]);
         }
 
         // 4. Update status peminjaman di database
         $peminjaman->update([
             'status' => $statusBaru,
+            'alasan' => $alasan,
         ]);
 
         return redirect()->back()->with('success', 'Status peminjaman dan stok berhasil diperbarui!');
@@ -284,7 +300,7 @@ class PeminjamanController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Mengajukan pengmbalian', $user->username . ', Mengajukan pengembalian:'. $id);
+        LogAktivitas::catat('Mengajukan pengmbalian', $user->username . ', Mengajukan pengembalian:' . $id);
 
         return redirect()->back()->with('success', 'Berhasil mengajukan pengembalian');
     }
@@ -298,7 +314,7 @@ class PeminjamanController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Mengajukan pengmbalian', $user->username . ', Mengajukan pengembalian:'. $id);
+        LogAktivitas::catat('Mengajukan pengmbalian', $user->username . ', Mengajukan pengembalian:' . $id);
 
         return redirect()->back()->with('success', 'Berhasil mengajukan pengembalian');
     }

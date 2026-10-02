@@ -63,7 +63,7 @@
                 </div>
             @endif
             <!-- Form Pengajuan -->
-            <form action="{{ url('/admin/pinjam/store') }}" method="POST" class="space-y-4">
+            <form action="{{ url('/admin/pinjam/store') }}" method="POST" class="space-y-4" onsubmit="this.querySelector('button[type=submit]').disabled = true;">
                 @csrf
                 <input type="hidden" name="id_alat" value="{{ $alat->id_alat }}">
                 <input type="hidden" name="tanggal_pinjam" value="{{ now()->toDateString() }}">
