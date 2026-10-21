@@ -70,23 +70,32 @@
                 <input type="hidden" name="tanggal_pinjam" value="{{ now()->toDateString() }}">
 
                 <!-- Input Jumlah Pinjam -->
+                <!-- Input Jumlah Pinjam -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Jumlah Pinjam</label>
-                    <input type="number" name="jumlah" min="1" max="{{ $alat->stok }}" value="1" required
-                        class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    <input type="number" name="jumlah" min="1" max="{{ $alat->stok }}" value="{{ old('jumlah', 1) }}" required
+                        class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('jumlah') border-red-500 focus:ring-red-500 @enderror"
                         placeholder="Masukkan jumlah yang ingin dipinjam">
-                    <p class="text-[10px] text-slate-400 mt-1">*Maksimal peminjaman {{ $alat->stok }} unit sesuai
-                        ketersediaan stok.</p>
-                </div>
 
+                    <!-- Menampilkan pesan error khusus jumlah -->
+                    @error('jumlah')
+                        <p class="text-[10px] text-red-500 mt-1 font-medium">{{ $message }}</p>
+                    @enderror
+
+                    <p class="text-[10px] text-slate-400 mt-1">*Maksimal peminjaman {{ $alat->stok }} unit sesuai ketersediaan stok.</p>
+                </div>
 
                 <!-- Input Tanggal Rencana Kembali -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Tanggal Rencana Kembali</label>
-                    <input type="date" name="tanggal_kembali" min="{{ date('Y-m-d') }}" required
-                        class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
+                    <input type="date" name="tanggal_kembali" min="{{ date('Y-m-d') }}" value="{{ old('tanggal_kembali') }}" required
+                        class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('tanggal_kembali') border-red-500 focus:ring-red-500 @enderror">
 
+                    <!-- Menampilkan pesan error khusus tanggal kembali -->
+                    @error('tanggal_kembali')
+                        <p class="text-[10px] text-red-500 mt-1 font-medium">{{ $message }}</p>
+                    @enderror
+                </div>
                 <!-- Action Buttons -->
                 <div class="pt-3 flex justify-end space-x-2 border-t border-slate-100">
                     <a href="{{ url('/peminjam/katalog') }}"

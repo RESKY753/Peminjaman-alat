@@ -21,7 +21,7 @@
                 <h2 class="text-xl font-bold text-slate-800">Pinjaman Saya</h2>
                 <p class="text-xs text-slate-500 mt-0.5">Daftar alat yang sedang Anda pinjam beserta riwayatnya.</p>
             </div>
-            <a href="{{ url('/peminjam/katalog') }}"
+            <a href="{{ url('/admin/katalog') }}"
                 class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold transition flex items-center space-x-1.5 shadow-sm">
                 <i class="fa-solid fa-plus"></i>
                 <span>Pinjam Alat Lagi</span>

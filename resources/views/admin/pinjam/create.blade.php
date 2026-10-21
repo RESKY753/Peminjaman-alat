@@ -63,7 +63,8 @@
                 </div>
             @endif
             <!-- Form Pengajuan -->
-            <form action="{{ url('/admin/pinjam/store') }}" method="POST" class="space-y-4" onsubmit="this.querySelector('button[type=submit]').disabled = true;">
+            <form action="{{ url('/admin/pinjam/store') }}" method="POST" class="space-y-4"
+                onsubmit="this.querySelector('button[type=submit]').disabled = true;">
                 @csrf
                 <input type="hidden" name="id_alat" value="{{ $alat->id_alat }}">
                 <input type="hidden" name="tanggal_pinjam" value="{{ now()->toDateString() }}">
@@ -71,31 +72,29 @@
                 <!-- Input Jumlah Pinjam -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Jumlah Pinjam</label>
-                    <input type="number" name="jumlah" min="1" max="{{ $alat->stok }}" value="1" required
-                        class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    <input type="number" name="jumlah"  max="{{ $alat->stok }}" min="1"
+                        value="{{ old('jumlah', 1) }}" required
+                        class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('jumlah') border-red-500 focus:ring-red-500 @enderror"
                         placeholder="Masukkan jumlah yang ingin dipinjam">
+
+                    @error('jumlah')
+                        <p class="text-[11px] text-red-600 mt-1 font-semibold">{{ $message }}</p>
+                    @enderror
                     <p class="text-[10px] text-slate-400 mt-1">*Maksimal peminjaman {{ $alat->stok }} unit sesuai
                         ketersediaan stok.</p>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Jaminan</label>
-                    <select name="jaminan" required
-                        class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
-                        <option value="" disabled selected>Pilih Jaminan</option>
-                        <option value="tidak ada jaminan">Tanpa Jaminan</option>
-                        <option value="KTP">KTP</option>
-                        <option value="SIM">SIM</option>
-                    </select>
-                </div>
-
                 <!-- Input Tanggal Rencana Kembali -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Tanggal Rencana Kembali</label>
-                    <input type="date" name="tanggal_kembali" min="{{ date('Y-m-d') }}" required
-                        class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
+                    <input type="date" name="tanggal_kembali" min="{{ date('Y-m-d') }}"
+                        value="{{ old('tanggal_kembali') }}" required
+                        class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('tanggal_kembali') border-red-500 focus:ring-red-500 @enderror">
 
-                <!-- Action Buttons -->
+                    <!-- Menampilkan pesan error khusus tanggal kembali -->
+                    @error('tanggal_kembali')
+                        <p class="text-[10px] text-red-500 mt-1 font-medium">{{ $message }}</p>
+                    @enderror
+                </div> <!-- Action Buttons -->
                 <div class="pt-3 flex justify-end space-x-2 border-t border-slate-100">
                     <a href="{{ url('/admin/katalog') }}"
                         class="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-200 transition inline-flex items-center">

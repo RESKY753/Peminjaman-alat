@@ -27,9 +27,11 @@ class userController extends Controller
         $myPinjamanCount = Peminjaman::where('id_user', Auth::user()->id_user)
             ->whereNotIn('status', ['dikembalikan', 'ditolak'])
             ->count();
-        $katalogCount = Alat::where('stok', '>', 0)->whereNotIn('status_alat', ['false'])->count();
+        $katalogCount = Alat::where('stok', '>', 0)
+            ->whereNotIn('status_alat', ['false'])
+            ->count();
 
-        $pendingCount = Peminjaman::whereNotIn('status', ['dikembalikan', 'dipinjam', 'ditolak','pengembalian ditolak'])->count();
+        $pendingCount = Peminjaman::whereNotIn('status', ['dikembalikan', 'dipinjam', 'ditolak', 'pengembalian ditolak'])->count();
         $activePinjamCount = Peminjaman::where('status', ['dipinjam'])->count();
         $totalPeminjam = Peminjaman::whereNotIn('status', ['ditolak', 'dikembalikan'])->count();
 
@@ -49,25 +51,38 @@ class userController extends Controller
             'password' => 'required',
         ]);
 
-        $email = $request->email;
+        $input = $request->email; // Bisa berupa email atau username
         $password = $request->password;
 
         // 2. Deteksi apakah input berupa email atau username
-        $fieldType = filter_var($email, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $isEmail = filter_var($input, FILTER_VALIDATE_EMAIL);
+
+        // 3. Jika BUKAN email (berarti username), kita cek sensitivitas huruf besarnya secara ketat
+        if (!$isEmail) {
+            // Cari user dengan username yang HARUS SAMA PERSIS (termasuk huruf besar/kecilnya)
+            // Menggunakan BINARY di MySQL agar pencarian huruf besar/kecil bersifat Case-Sensitive
+            $userCheck = User::whereRaw('BINARY username = ?', [$input])->first();
+
+            // Jika username tidak ditemukan persis (misal di DB 'resky', tapi diinput 'Resky')
+            if (!$userCheck) {
+                return back()->with('error', 'Username atau Password salah!')->withInput();
+            }
+        }
+
+        // 4. Lanjutkan proses kredensial normal
+        $fieldType = $isEmail ? 'email' : 'username';
 
         $credentials = [
-            $fieldType => $email,
+            $fieldType => $input,
             'password' => $password,
         ];
 
-        // 3. Coba Autentikasi
-        // 3. Coba Autentikasi
+        // 5. Coba Autentikasi
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
 
-            // Cek apakah user di-blacklist (status_aktif bukan 'true' atau bernilai 'blacklist')
+            // Cek apakah user di-blacklist
             if ($user->status_aktif !== 'true') {
-                // Keluarkan / logout kembali user yang terlanjur login
                 Auth::logout();
 
                 $request->session()->invalidate();
@@ -76,7 +91,7 @@ class userController extends Controller
                 return redirect()->to('/')->with('error', 'Akun anda di-blacklist atau dinonaktifkan.');
             }
 
-            // Jika aktif ('true'), lanjutkan proses login normal
+            // Jika aktif ('true'), lanjutkan login normal
             $request->session()->regenerate();
 
             LogAktivitas::catat('Login', 'User ' . $user->username . ' berhasil login ' . $user->id_user);
@@ -139,7 +154,7 @@ class userController extends Controller
     {
         $validated = $request->validate(
             [
-                'username' => 'required',
+                'username' => ['required', Rule::unique('users', 'username')],
                 'email' => ['required', 'email', Rule::unique('users', 'email')],
                 'telp' => 'required',
                 'password' => 'nullable|min:6|required',
@@ -149,6 +164,7 @@ class userController extends Controller
             ],
             [
                 'username.required' => 'Username wajib diisi!',
+                'username.unique' => 'Usename sudah digunakan',
                 'email.unique' => 'Email sudah terdaftar, gunakan email lain!',
                 'email.required' => 'Alamat email wajib diisi!',
                 'email.email' => 'Format email tidak valid!',
@@ -180,7 +196,7 @@ class userController extends Controller
     {
         $request->validate(
             [
-                'username' => 'required',
+                'username' => ['required', Rule::unique('users', 'username')->ignore($id, 'id_user')],
                 'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($id, 'id_user')],
                 'telp' => 'required',
                 'password' => 'nullable|min:6',
@@ -189,6 +205,7 @@ class userController extends Controller
             ],
             [
                 'username.required' => 'Username wajib diisi!',
+                'username.unique' => 'Username sudah digunakan',
                 'email.unique' => 'Email sudah terdaftar, gunakan email lain!',
                 'email.required' => 'Alamat email wajib diisi!',
                 'email.email' => 'Format email tidak valid!',
@@ -252,9 +269,7 @@ class userController extends Controller
         $targetUser = User::with('peminjaman')->findOrFail($id);
         $namaTarget = $targetUser->username;
         $masihDipinjam = $targetUser
-            ->peminjaman()
-            ->whereIn('status', ['dipinjam', 'ajukan kembali'])
-            ->exists();
+            ->peminjaman()->whereNotIn('status', ['dikembalikan', 'ditolak'])->exists();
 
         if ($masihDipinjam) {
             return redirect()->back()->with('error', 'User tidak bisa di blacklist karena masih meminjam alat');

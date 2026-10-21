@@ -31,28 +31,29 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100 text-xs text-slate-700">
 
-                        <!-- CONTOH 1 DATA DUMMY (STATUS: DIKEMBALIKAN / SELESAI) -->
-                        @foreach ($histori as $index => $item)
+                        @forelse ($histori as $index => $item)
                             <tr class="hover:bg-slate-50/50 transition">
                                 <td class="py-4 px-6 font-medium text-slate-500">{{ $index + 1 }}</td>
                                 <td class="py-4 px-6 font-semibold text-slate-800 flex items-center space-x-3">
                                     <div
                                         class="w-9 h-9 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden flex-shrink-0">
                                         <img src="{{ asset('uploads/alat/' . $item->peminjaman->alat->foto) }}"
-                                            alt="{{ $item->peminjaman->alat->namaAlat }}" class="w-full h-full object-cover">
+                                            alt="{{ $item->peminjaman->alat->namaAlat }}"
+                                            class="w-full h-full object-cover">
                                     </div>
                                     <span>{{ $item->peminjaman->alat->nama_alat }}</span>
                                 </td>
-                                <td class="py-4 px-6">{{ $item->peminjaman->jumlah . "Unit" }}</td>
-                                <td class="py-4 px-6">{{ $item->peminjaman->jaminan}}</td>
+                                <td class="py-4 px-6">{{ $item->peminjaman->jumlah . 'Unit' }}</td>
+                                <td class="py-4 px-6">{{ $item->peminjaman->jaminan }}</td>
                                 <td class="py-4 px-6 text-slate-500">{{ $item->peminjaman->tanggal_pinjam }}</td>
                                 <td class="py-4 px-6 text-slate-500">{{ $item->created_at }}</td>
-                                <td class="py-4 px-6 text-slate-500">{{ $item->peminjaman->alasan ?? 'Tanpa alasan'}}</td>
+                                <td class="py-4 px-6 text-slate-500">{{ $item->peminjaman->alasan ?? 'Tanpa alasan' }}</td>
                                 <td class="py-4 px-6">
                                     @if ($item->status_akhir == 'dikembalikan')
                                         <span
                                             class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-600 border border-emerald-200">
-                                            <i class="fa-solid fa-circle-check mr-1.5 text-[9px]"></i> Selesai (Dikembalikan)
+                                            <i class="fa-solid fa-circle-check mr-1.5 text-[9px]"></i> Selesai
+                                            (Dikembalikan)
                                         </span>
                                     @else
                                         <span
@@ -62,7 +63,14 @@
                                     @endif
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="8" class="py-8 px-6 text-center text-slate-500">
+                                    <i class="fa-solid fa-box-open text-3xl mb-2 text-slate-300"></i>
+                                    <p class="text-xs font-medium">Data histori tidak ditemukan atau masih kosong.</p>
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

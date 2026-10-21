@@ -109,12 +109,17 @@ class PeminjamanController extends Controller
     }
     public function createAdmin($id)
     {
-        $alat = Alat::join('kategori', 'alat.id_kategori', '=', 'kategori.id_kategori')
-            ->select('alat.id_alat', 'alat.nama_alat', 'alat.foto', 'alat.spesifikasi', 'alat.stok', 'alat.kondisi', 'kategori.nama_kategori')
-            ->where('alat.id_alat', $id) // Where dipanggil DULUAN untuk memfilter ID
-            ->first(); // Executed paling akhir untuk ambil 1 data
+        $alat = Alat::findOrFail($id);
+        if ($alat->status_alat == 'false') {
+            return redirect('/admin/katalog')->with('error', 'alat tidak ada');
+        } else {
+            $alat = Alat::join('kategori', 'alat.id_kategori', '=', 'kategori.id_kategori')
+                ->select('alat.id_alat', 'alat.nama_alat', 'alat.foto', 'alat.spesifikasi', 'alat.stok', 'alat.kondisi', 'kategori.nama_kategori')
+                ->where('alat.id_alat', $id) // Where dipanggil DULUAN untuk memfilter ID
+                ->first(); // Executed paling akhir untuk ambil 1 data
 
-        return view('admin.pinjam.create', compact('alat'));
+            return view('admin.pinjam.create', compact('alat'));
+        }
     }
 
     /**
@@ -124,12 +129,32 @@ class PeminjamanController extends Controller
     {
         $id_user = Auth::id();
 
-        $request->validate([
-            'id_alat' => 'required',
-            'jumlah' => 'required',
-            'tanggal_pinjam' => 'required',
-            'tanggal_kembali' => 'required',
-        ]);
+
+        $alat = Alat::find($request->id_alat);
+
+
+        $maxStok = $alat ? $alat->stok : 0;
+
+        $request->validate(
+            [
+                'id_alat' => 'required',
+                'jumlah' => 'required|integer|min:1|max:'. $maxStok,
+                'tanggal_pinjam' => 'required|date',
+                'tanggal_kembali' => 'required|date|after_or_equal:tanggal_pinjam',
+            ],
+            [
+                'id_alat.required' => 'Alat wajib dipilih.',
+                'jumlah.required' => 'Jumlah pinjam wajib diisi.',
+                'jumlah.integer' => 'Jumlah pinjam harus berupa angka bulat.',
+                'jumlah.min' => 'Jumlah pinjam minimal adalah 1.',
+                'jumlah.max' => 'Jumlah pinjam maksimal adalah' . $maxStok,
+                'tanggal_pinjam.required' => 'Tanggal pinjam wajib diisi.',
+                'tanggal_pinjam.date' => 'Format tanggal pinjam tidak valid.',
+                'tanggal_kembali.required' => 'Tanggal kembali wajib diisi.',
+                'tanggal_kembali.date' => 'Format tanggal kembali tidak valid.',
+                'tanggal_kembali.after_or_equal' => 'Tanggal kembali tidak boleh lebih cepat dari tanggal peminjaman.',
+            ],
+        );
 
         // if ($alat->stok < $request->jumlah) {
         //     return redirect()->back()->with('error', 'Stok alat tidak mencukupi.');
@@ -158,12 +183,25 @@ class PeminjamanController extends Controller
     {
         $id_user = Auth::id();
 
-        $request->validate([
-            'id_alat' => 'required',
-            'jumlah' => 'required',
-            'tanggal_pinjam' => 'required',
-            'tanggal_kembali' => 'required',
-        ]);
+        $request->validate(
+            [
+                'id_alat' => 'required',
+                'jumlah' => 'required|integer|min:1',
+                'tanggal_pinjam' => 'required|date',
+                'tanggal_kembali' => 'required|date|after_or_equal:tanggal_pinjam',
+            ],
+            [
+                'id_alat.required' => 'Alat wajib dipilih.',
+                'jumlah.required' => 'Jumlah pinjam wajib diisi.',
+                'jumlah.integer' => 'Jumlah pinjam harus berupa angka bulat.',
+                'jumlah.min' => 'Jumlah pinjam minimal adalah 1.',
+                'tanggal_pinjam.required' => 'Tanggal pinjam wajib diisi.',
+                'tanggal_pinjam.date' => 'Format tanggal pinjam tidak valid.',
+                'tanggal_kembali.required' => 'Tanggal kembali wajib diisi.',
+                'tanggal_kembali.date' => 'Format tanggal kembali tidak valid.',
+                'tanggal_kembali.after_or_equal' => 'Tanggal kembali tidak boleh lebih cepat dari tanggal peminjaman.',
+            ],
+        );
 
         Peminjaman::create([
             'id_alat' => $request->id_alat,
@@ -233,6 +271,12 @@ class PeminjamanController extends Controller
 
         // 3. Logika Kelola Stok
 
+         $request->validate([
+            'alasan' => 'required',
+        ],[
+            'alasan.required' => 'Alasan wajib diisi',
+        ]);
+        
         // JIKA DISETUJUI PINJAM (ajukan peminjaman -> dipinjam)
         if ($statusBaru == 'dipinjam' && $statusLama == 'ajukan peminjaman') {
             // Cek kecukupan stok sebelum dikurangi
@@ -280,6 +324,7 @@ class PeminjamanController extends Controller
                 'created_at' => now(),
             ]);
         }
+
 
         // 4. Update status peminjaman di database
         $peminjaman->update([

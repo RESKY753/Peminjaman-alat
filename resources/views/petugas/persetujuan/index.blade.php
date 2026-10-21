@@ -245,9 +245,15 @@
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Masukkan alasan penolakan:</label>
+                        <!-- Tambahkan old('alasan') di dalam tag textarea -->
                         <textarea name="alasan" rows="4" required
                             class="w-full text-sm border border-slate-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-rose-500"
-                            placeholder="Contoh: Stok alat habis / Jaminan tidak valid..."></textarea>
+                            placeholder="Contoh: Stok alat habis / Jaminan tidak valid...">{{ old('alasan') }}</textarea>
+
+                        <!-- TAMBAHKAN KODE INI UNTUK MEMUNCULKAN PESAN ERROR MERAH -->
+                        @error('alasan')
+                            <span class="text-xs font-semibold text-rose-500 mt-1 block">* {{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div class="flex justify-end space-x-2">
@@ -265,7 +271,6 @@
         </div>
 
         <!-- JavaScript untuk Mengontrol Modal -->
-        <!-- JavaScript untuk Mengontrol Modal -->
         <script>
             function bukaModalTolak(urlAction, statusValue) {
                 const modal = document.getElementById('modalTolak');
@@ -273,7 +278,10 @@
                 const statusInput = document.getElementById('statusInput');
 
                 form.action = urlAction; // Set URL action form sesuai ID peminjaman
-                statusInput.value = statusValue; // Masukkan value ('ditolak' atau 'pengembalian ditolak') ke input hidden
+                statusInput.value = statusValue; // Masukkan value ke input hidden
+
+                // SIMPAN URL KE BROWSER AGAR TIDAK HILANG SAAT RELOAD (VALIDASI GAGAL)
+                sessionStorage.setItem('urlActionTolak', urlAction);
 
                 modal.classList.remove('hidden'); // Tampilkan modal
             }
@@ -281,6 +289,28 @@
             function tutupModalTolak() {
                 const modal = document.getElementById('modalTolak');
                 modal.classList.add('hidden'); // Sembunyikan modal
+                sessionStorage.removeItem('urlActionTolak'); // Bersihkan storage
             }
         </script>
+
+        <!-- SCRIPT TAMBAHAN: BUKA OTOMATIS JIKA ADA ERROR VALIDASI -->
+        @if ($errors->has('alasan'))
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    const modal = document.getElementById('modalTolak');
+                    const form = document.getElementById('formTolak');
+                    const statusInput = document.getElementById('statusInput');
+
+                    // Ambil kembali URL action yang sempat disimpan
+                    const savedUrl = sessionStorage.getItem('urlActionTolak');
+                    const savedStatus = "{{ old('status') }}"; // Ambil status lama dari Laravel
+
+                    if (savedUrl) {
+                        form.action = savedUrl;
+                        statusInput.value = savedStatus;
+                        modal.classList.remove('hidden'); // Buka kembali modalnya!
+                    }
+                });
+            </script>
+        @endif
     @endsection

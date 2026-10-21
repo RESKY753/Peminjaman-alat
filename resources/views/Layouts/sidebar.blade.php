@@ -2,10 +2,11 @@
 <div x-data="{ sidebarOpen: false }" class="relative h-screen w-screen overflow-hidden bg-slate-100 flex">
 
     <!-- 1. OVERLAY MASK (Mobile Only) -->
-    <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition:enter="transition-opacity ease-linear duration-300"
-        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-        x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0" class="fixed inset-0 bg-slate-900/60 z-40 md:hidden backdrop-blur-sm" x-cloak>
+    <div x-show="sidebarOpen" @click="sidebarOpen = false"
+        x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300"
+        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+        class="fixed inset-0 bg-slate-900/60 z-40 md:hidden backdrop-blur-sm" x-cloak>
     </div>
 
     <!-- 2. SIDEBAR (STAYS FIXED - TIDAK BERGERAK SAMA SEKALI) -->
@@ -199,8 +200,7 @@
 
             <span
                 class="px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-semibold rounded-full border border-indigo-100 shadow-sm">
-                Status: Login sebagai <span
-                    class="capitalize font-bold">{{ auth()->user()->role ?? 'Peminjam' }}</span>
+                Status: Login sebagai <span class="capitalize font-bold">{{ auth()->user()->role ?? 'Peminjam' }}</span>
             </span>
         </header>
 
