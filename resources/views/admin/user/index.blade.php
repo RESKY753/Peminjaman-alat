@@ -26,7 +26,7 @@
         </div>
     @endif
 
-    <!-- Header Page & Tombol Ke Halaman Tambah -->
+    {{--  Header Page & Tombol Ke Halaman Tambah  --}}
     <div
         class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -41,7 +41,7 @@
         </a>
     </div>
 
-    <!-- BARIS FILTER & PENCARIAN -->
+    {{--  BARIS FILTER & PENCARIAN  --}}
     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mt-6">
         <form method="GET" action="{{ url('/admin/user') }}" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div class="relative">
@@ -86,7 +86,7 @@
         </form>
     </div>
 
-    <!-- Tabel Data User (Read) -->
+    {{--  Tabel Data User (Read)  --}}
     <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm mt-6">
         <div class="overflow-x-auto w-full">
             <table class="w-full text-left text-sm text-slate-600 min-w-[640px]">
@@ -109,7 +109,7 @@
                             $isBlacklist = strtolower($item->status_aktif) === 'blacklist';
                         @endphp
 
-                        <!-- Baris Tr Berubah Warna Abu-abu Jika Di-blacklist -->
+                        {{--  Baris Tr Berubah Warna Abu-abu Jika Di-blacklist  --}}
                         <tr
                             class="transition {{ $isBlacklist ? 'bg-slate-100/80 text-slate-400' : 'hover:bg-slate-50/80' }}">
 
@@ -174,7 +174,7 @@
                                 {{ $item->created_at ? $item->created_at->format('Y-m-d H:i') : '-' }}
                             </td>
 
-                            <!-- Kolom Badge Status -->
+                            {{--  Kolom Badge Status  --}}
                             <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                                 @if ($isBlacklist)
                                     <span
@@ -189,18 +189,18 @@
                                 @endif
                             </td>
 
-                            <!-- Kolom Tombol Aksi & Toggle Blacklist -->
+                            {{--  Kolom Tombol Aksi & Toggle Blacklist  --}}
                             <td class="px-4 sm:px-6 py-4 text-center whitespace-nowrap">
                                 <div class="flex items-center justify-center space-x-1.5">
 
-                                    <!-- Tombol Edit -->
+                                    {{--  Tombol Edit  --}}
                                     <a href="{{ url('/admin/user/edit/' . $item->id_user) }}"
                                         class="p-2 text-amber-500 hover:bg-amber-50 rounded-lg transition"
                                         title="Edit User">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </a>
 
-                                    <!-- Tombol Toggle Blacklist / Pulihkan -->
+                                    {{--  Tombol Toggle Blacklist / Pulihkan  --}}
                                     @csrf
                                     @method('PUT')
                                     @if ($isBlacklist)
@@ -210,7 +210,7 @@
                                             <button type="submit"
                                                 class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg text-xs font-semibold transition flex items-center space-x-1"
                                                 title="Pulihkan dari Blacklist"
-                                                 onclick="return confirm('Yakin ingin memulihkan user ini?')">
+                                                 onclick=" return konfirmasiForm(this, 'Pulihkan User ini?')">
                                                 <i class="fa-solid fa-rotate-left"></i>
                                                 <span>Pulihkan</span>
                                             </button>
@@ -222,7 +222,7 @@
                                             <button type="submit"
                                                 class="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-semibold transition flex items-center space-x-1"
                                                 title="Blacklist User Ini"
-                                                onclick="return confirm('Yakin ingin mem-blacklist user ini?')">
+                                                 onclick="return konfirmasiForm(this, 'Blacklist user ini?')">
                                                 <i class="fa-solid fa-ban"></i>
                                                 <span>Blacklist</span>
                                             </button>
@@ -230,7 +230,7 @@
                                     @endif
                                     </form>
 
-                                    {{-- <!-- Form Hapus -->
+                                    {{--
                                     <form action="{{ url('/admin/user/delete/' . $item->id_user) }}" method="POST"
                                         onsubmit="return confirm('Apakah kamu yakin ingin menghapus user {{ addslashes($item->username) }}?')"
                                         class="inline">
@@ -257,7 +257,7 @@
                 </table>
             </div>
 
-            <!-- AREA PAGINATION LINK -->
+            {{--  AREA PAGINATION LINK  --}}
             @if (method_exists($user, 'hasPages') && $user->hasPages())
                 <div class="p-4 border-t border-slate-100 bg-slate-50/50">
                     {{ $user->links() }}

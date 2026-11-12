@@ -12,10 +12,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 
-// Route Tampilan Form Login (Must be GET and named 'login')
+// Route Tampilan Form Login 
 Route::get('/', function () {
     return view('auth.login');
 })->name('login');
+
 
 // Route Eksekusi Login
 Route::post('/login', [userController::class, 'proseslogin'])->name('login.proses');

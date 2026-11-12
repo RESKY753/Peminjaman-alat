@@ -20,12 +20,12 @@ class AlatController extends Controller
 
         // Filter Pencarian Nama Alat
         if ($request->filled('search')) {
-            $query->where('nama_alat', 'like', '%' . $request->search . '%');
+            $query->where('nama_alat', 'like', '%'.$request->search.'%');
 
             $user = Auth::user();
 
             // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-            LogAktivitas::catat('Mencari nama alat', $user->username . ' ,Mencari nama alat' . $request->search);
+            LogAktivitas::catat('Mencari nama alat', $user->username.' ,Mencari nama alat'.$request->search);
         }
         if ($request->filled('status_alat')) {
             $query->where('status_alat', $request->status_alat);
@@ -33,7 +33,7 @@ class AlatController extends Controller
             $user = Auth::user();
 
             // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-            LogAktivitas::catat('Mencari nama alat berdasarkan status', $user->username . ' ,Mencari alat berdasarkan status');
+            LogAktivitas::catat('Mencari nama alat berdasarkan status', $user->username.' ,Mencari alat berdasarkan status');
         }
 
         // Paginasi 15 data per halaman
@@ -41,10 +41,10 @@ class AlatController extends Controller
 
         return view('admin.alat.index', compact('alat'));
     }
+
     /**
      * Show the form for creating a new resource.
      */
-
     public function indexKatalog(Request $request)
     {
         $kategori = Kategori::all();
@@ -58,17 +58,17 @@ class AlatController extends Controller
             $user = Auth::user();
 
             // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-            LogAktivitas::catat('Mencari alat berdasarkan kategori', $user->username . ' ,Mencari alat bersarkan kategori' . $user->id_user);
+            LogAktivitas::catat('Mencari alat berdasarkan kategori', $user->username.' ,Mencari alat bersarkan kategori'.$user->id_user);
         }
 
         // Filter Pencarian Nama Alat
         if ($request->filled('search')) {
-            $query->where('nama_alat', 'like', '%' . $request->search . '%');
+            $query->where('nama_alat', 'like', '%'.$request->search.'%');
 
             $user = Auth::user();
 
             // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-            LogAktivitas::catat('Mencari alat berdasarkan nama', $user->username . ' ,Mencari alat berdasarkan nama' . $user->id_user);
+            LogAktivitas::catat('Mencari alat berdasarkan nama', $user->username.' ,Mencari alat berdasarkan nama'.$user->id_user);
         }
 
         // Urutkan stok > 0 di atas, stok 0 di paling bawah
@@ -76,6 +76,7 @@ class AlatController extends Controller
 
         return view('peminjam.katalog.index', compact('alat', 'kategori'));
     }
+
     public function indexKatalogAdmin(Request $request)
     {
         $kategori = Kategori::all();
@@ -89,17 +90,17 @@ class AlatController extends Controller
             $user = Auth::user();
 
             // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-            LogAktivitas::catat('Mencari alat berdasarkan kategori', $user->username . ' ,Mencari alat bersarkan kategori' . $user->id_user);
+            LogAktivitas::catat('Mencari alat berdasarkan kategori', $user->username.' ,Mencari alat bersarkan kategori'.$user->id_user);
         }
 
         // Filter Pencarian Nama Alat
         if ($request->filled('search')) {
-            $query->where('nama_alat', 'like', '%' . $request->search . '%');
+            $query->where('nama_alat', 'like', '%'.$request->search.'%');
 
             $user = Auth::user();
 
             // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-            LogAktivitas::catat('Mencari alat berdasarkan nama', $user->username . ' ,Mencari alat berdasarkan nama' . $user->id_user);
+            LogAktivitas::catat('Mencari alat berdasarkan nama', $user->username.' ,Mencari alat berdasarkan nama'.$user->id_user);
         }
 
         // Urutkan stok > 0 di atas, stok 0 di paling bawah
@@ -111,6 +112,7 @@ class AlatController extends Controller
     public function create()
     {
         $kategori = Kategori::whereNotIn('status_aktif', ['false'])->get();
+
         return view('admin.alat.create', compact('kategori'));
     }
 
@@ -119,7 +121,7 @@ class AlatController extends Controller
      */
     public function store(Request $request)
     {
-        //1.validasi
+        // 1.validasi
         $request->validate(
             [
                 'nama_alat' => 'required',
@@ -147,7 +149,7 @@ class AlatController extends Controller
             $file = $request->file('foto');
 
             // Buat nama file yang unik berdasarkan timestamp agar tidak saling menimpa
-            $namaFoto = time() . '_' . $file->getClientOriginalName();
+            $namaFoto = time().'_'.$file->getClientOriginalName();
 
             // Simpan file ke dalam folder 'public/uploads/alat'
             $file->move(public_path('uploads/alat'), $namaFoto);
@@ -166,26 +168,16 @@ class AlatController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Menambahkan Alat', $user->username . ', Menambahkan Alat:' . $request->nama_alat);
+        LogAktivitas::catat('Menambahkan Alat', $user->username.', Menambahkan Alat:'.$request->nama_alat);
 
         return redirect('/admin/alat')->with('success', 'Alat berhasil ditambahkan');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Alat $alat)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit($id)
     {
         $kategori = Kategori::all();
         $alat = Alat::findOrFail($id);
+
         return view('admin.alat.edit', compact('alat', 'kategori'));
     }
 
@@ -201,7 +193,7 @@ class AlatController extends Controller
             'stok' => 'required|integer|min:0', // Pakai integer|min:0 agar stok 0 diizinkan
             'kondisi' => 'required',
             'spesifikasi' => 'required',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048', // Pakai nullable
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048', 
         ]);
 
         // 2. Cari data alat
@@ -213,7 +205,7 @@ class AlatController extends Controller
         if ($request->hasFile('foto')) {
             // Hapus foto lama jika ada dan filenya eksis
             if ($alat->foto) {
-                $fotoLama = public_path('uploads/alat/' . $alat->foto);
+                $fotoLama = public_path('uploads/alat/'.$alat->foto);
                 if (File::exists($fotoLama)) {
                     File::delete($fotoLama);
                 }
@@ -221,7 +213,7 @@ class AlatController extends Controller
 
             // Upload foto baru
             $file = $request->file('foto');
-            $namaFoto = time() . '_' . $file->getClientOriginalName();
+            $namaFoto = time().'_'.$file->getClientOriginalName();
             $file->move(public_path('uploads/alat'), $namaFoto);
         }
 
@@ -238,7 +230,7 @@ class AlatController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Mengubah alat', $user->username . ', Mengubah alat:' . ' ALT-0' . $id);
+        LogAktivitas::catat('Mengubah alat', $user->username.', Mengubah alat:'.' ALT-0'.$id);
 
         return redirect('admin/alat')->with('success', 'Alat berhasil diubah');
     }
@@ -252,11 +244,12 @@ class AlatController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Menghapus alat', $user->username . ' ,Menghapus alat:' . ' ALT-0' . $id);
+        LogAktivitas::catat('Menghapus alat', $user->username.' ,Menghapus alat:'.' ALT-0'.$id);
+
         return redirect()->back()->with('success', 'Alat berhasil dihapus');
     }
 
-    function nonAktif($id)
+    public function nonAktif($id)
     {
         $alat = Alat::findOrFail($id);
 
@@ -264,11 +257,12 @@ class AlatController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Menonaktifkan alat', $user->username . ' ,Menonaktifkan alat:' . ' ALT-0' . $id);
+        LogAktivitas::catat('Menonaktifkan alat', $user->username.' ,Menonaktifkan alat:'.' ALT-0'.$id);
+
         return redirect()->back()->with('success', 'Alat berhasil dinonaktif');
     }
 
-    function Aktif($id)
+    public function Aktif($id)
     {
         $alat = Alat::findOrFail($id);
 
@@ -276,7 +270,8 @@ class AlatController extends Controller
         $user = Auth::user();
 
         // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
-        LogAktivitas::catat('Mengaktifkan alat', $user->username . ' ,Mengaktifkan alat:' . ' ALT-0' . $id);
+        LogAktivitas::catat('Mengaktifkan alat', $user->username.' ,Mengaktifkan alat:'.' ALT-0'.$id);
+
         return redirect()->back()->with('success', 'Alat berhasil dinonaktif');
     }
 }

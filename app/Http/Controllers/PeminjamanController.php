@@ -26,15 +26,23 @@ class PeminjamanController extends Controller
         return view('admin.katalog.index');
     }
 
-    function indexPersetujuan()
+    function indexPersetujuan(Request $request)
     {
         $persetujuan = DB::table('peminjaman')
             ->join('users', 'peminjaman.id_user', '=', 'users.id_user')
             ->join('alat', 'peminjaman.id_alat', '=', 'alat.id_alat')
             ->select('peminjaman.id_peminjaman', 'peminjaman.jumlah', 'peminjaman.jaminan', 'users.username', 'alat.nama_alat', 'peminjaman.tanggal_pinjam', 'peminjaman.tanggal_kembali', 'peminjaman.status')
-            ->whereIn('status', ['ajukan peminjaman', 'dipinjam', 'ajukan kembali', 'pengembalian ditolak'])
-            ->orderBy('peminjaman.tanggal_kembali', 'asc')
+            ->whereIn('peminjaman.status', ['ajukan peminjaman', 'dipinjam', 'ajukan kembali', 'pengembalian ditolak'])
+
+            ->when($request->filled('tgl_pinjam'), function ($query) use ($request) {
+                $query->whereDate('peminjaman.tanggal_pinjam', '=', $request->tgl_pinjam);
+            })
+            ->when($request->filled('tgl_kembali'), function ($query) use ($request) {
+                $query->whereDate('peminjaman.tanggal_kembali', '=', $request->tgl_kembali);
+            })
+            ->orderBy('peminjaman.tanggal_kembali', 'desc')
             ->get();
+
         return view('petugas.persetujuan.index', compact('persetujuan'));
     }
 
@@ -129,16 +137,14 @@ class PeminjamanController extends Controller
     {
         $id_user = Auth::id();
 
-
         $alat = Alat::find($request->id_alat);
-
 
         $maxStok = $alat ? $alat->stok : 0;
 
         $request->validate(
             [
                 'id_alat' => 'required',
-                'jumlah' => 'required|integer|min:1|max:'. $maxStok,
+                'jumlah' => 'required|integer|min:1|max:' . $maxStok,
                 'tanggal_pinjam' => 'required|date',
                 'tanggal_kembali' => 'required|date|after_or_equal:tanggal_pinjam',
             ],
@@ -264,19 +270,22 @@ class PeminjamanController extends Controller
 
         $statusLama = $peminjaman->status;
         $statusBaru = $request->status;
+
         $alasan = $request->alasan;
 
         // 2. Ambil data alat terkait
         $alat = Alat::findOrFail($peminjaman->id_alat);
+        // 3. Validasi: Alasan HANYA wajib jika status baru adalah 'ditolak'
 
-        // 3. Logika Kelola Stok
+        $request->validate(
+            [
+                'alasan' => $statusBaru == 'ditolak' ? 'required' : 'nullable',
+            ],
+            [
+                'alasan.required' => 'Alasan penolakan wajib diisi',
+            ],
+        );
 
-         $request->validate([
-            'alasan' => 'required',
-        ],[
-            'alasan.required' => 'Alasan wajib diisi',
-        ]);
-        
         // JIKA DISETUJUI PINJAM (ajukan peminjaman -> dipinjam)
         if ($statusBaru == 'dipinjam' && $statusLama == 'ajukan peminjaman') {
             // Cek kecukupan stok sebelum dikurangi
@@ -324,7 +333,6 @@ class PeminjamanController extends Controller
                 'created_at' => now(),
             ]);
         }
-
 
         // 4. Update status peminjaman di database
         $peminjaman->update([

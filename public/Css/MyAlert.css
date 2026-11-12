@@ -1,0 +1,412 @@
+:root {
+  /* Warna Utama */
+  --ma-success: #10b981;
+  --ma-success-light: #d1fae5;
+  --ma-success-dark: #059669;
+
+  --ma-error: #ef4444;
+  --ma-error-light: #fee2e2;
+  --ma-error-dark: #dc2626;
+
+  --ma-info: #3b82f6;
+  --ma-info-light: #dbeafe;
+  --ma-info-dark: #2563eb;
+
+  --ma-warning: #f59e0b;
+  --ma-warning-light: #fef3c7;
+  --ma-warning-dark: #d97706;
+
+  /* Warna Netral */
+  --ma-bg: #ffffff;
+  --ma-text: #1e293b;
+  --ma-text-secondary: #64748b;
+  --ma-border: #e2e8f0;
+  --ma-overlay: rgba(15, 23, 42, 0.6);
+
+  /* Ukuran */
+  --ma-radius: 20px;
+  --ma-radius-sm: 12px;
+  --ma-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Dark Mode */
+.dark {
+  --ma-bg: #1e293b;
+  --ma-text: #f1f5f9;
+  --ma-text-secondary: #94a3b8;
+  --ma-border: #334155;
+  --ma-overlay: rgba(0, 0, 0, 0.7);
+
+  --ma-success-light: rgba(16, 185, 129, 0.15);
+  --ma-error-light: rgba(239, 68, 68, 0.15);
+  --ma-info-light: rgba(59, 130, 246, 0.15);
+  --ma-warning-light: rgba(245, 158, 11, 0.15);
+}
+
+.myalert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--ma-overlay);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+  opacity 0.3s ease,
+  visibility 0.3s ease;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.myalert-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.myalert-container {
+  background: var(--ma-bg);
+  border-radius: var(--ma-radius);
+  box-shadow: var(--ma-shadow);
+  max-width: 420px;
+  width: 100%;
+  overflow: hidden;
+  transform: scale(0.8) translateY(20px);
+  opacity: 0;
+  transition:
+  transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+  opacity 0.3s ease;
+  position: relative;
+}
+
+.myalert-overlay.active .myalert-container {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+/* Animasi Shake untuk Error */
+@keyframes myalert-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+.myalert-container.shake {
+  animation: myalert-shake 0.6s ease-in-out;
+}
+
+.myalert-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--ma-border);
+  color: var(--ma-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  z-index: 10;
+}
+
+.myalert-close:hover {
+  background: var(--ma-error);
+  color: white;
+  transform: rotate(90deg);
+}
+
+.myalert-icon-wrapper {
+  padding: 40px 40px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.myalert-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  position: relative;
+  overflow: hidden;
+}
+
+.myalert-icon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  opacity: 0.15;
+}
+
+/* Icon Pulse Animation */
+@keyframes myalert-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.myalert-icon i {
+  animation: myalert-pulse 2s ease-in-out infinite;
+}
+
+/* Icon Types */
+.myalert-icon.success {
+  background: var(--ma-success-light);
+  color: var(--ma-success);
+}
+
+.myalert-icon.error {
+  background: var(--ma-error-light);
+  color: var(--ma-error);
+}
+
+.myalert-icon.info {
+  background: var(--ma-info-light);
+  color: var(--ma-info);
+}
+
+.myalert-icon.warning {
+  background: var(--ma-warning-light);
+  color: var(--ma-warning);
+}
+
+.myalert-icon.prompt {
+  background: var(--ma-info-light);
+  color: var(--ma-info);
+}
+
+.myalert-content {
+  padding: 0 40px 30px;
+  text-align: center;
+}
+
+.myalert-title {
+  font-family:
+  "Outfit",
+  system-ui,
+  -apple-system,
+  sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ma-text);
+  margin: 0 0 10px;
+  line-height: 1.3;
+}
+
+.myalert-message {
+  font-family:
+  "Outfit",
+  system-ui,
+  -apple-system,
+  sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--ma-text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.myalert-input-wrapper {
+  padding: 0 40px 10px;
+}
+
+.myalert-input {
+  width: 100%;
+  padding: 14px 18px;
+  font-family:
+  "Outfit",
+  system-ui,
+  -apple-system,
+  sans-serif;
+  font-size: 16px;
+  border: 2px solid var(--ma-border);
+  border-radius: var(--ma-radius-sm);
+  background: var(--ma-bg);
+  color: var(--ma-text);
+  outline: none;
+  transition:
+  border-color 0.2s ease,
+  box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.myalert-input:focus {
+  border-color: var(--ma-info);
+  box-shadow: 0 0 0 4px var(--ma-info-light);
+}
+
+.myalert-input::placeholder {
+  color: var(--ma-text-secondary);
+  opacity: 0.7;
+}
+
+.myalert-buttons {
+  padding: 0 40px 40px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.myalert-btn {
+  font-family:
+  "Outfit",
+  system-ui,
+  -apple-system,
+  sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px 28px;
+  border-radius: var(--ma-radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+  justify-content: center;
+}
+
+.myalert-btn:active {
+  transform: scale(0.96);
+}
+
+/* Button - Confirm */
+.myalert-btn.confirm {
+  background: var(--ma-info);
+  color: white;
+}
+
+.myalert-btn.confirm:hover {
+  background: var(--ma-info-dark);
+  box-shadow: 0 8px 20px -6px var(--ma-info);
+}
+
+.myalert-btn.confirm.success {
+  background: var(--ma-success);
+}
+
+.myalert-btn.confirm.success:hover {
+  background: var(--ma-success-dark);
+  box-shadow: 0 8px 20px -6px var(--ma-success);
+}
+
+.myalert-btn.confirm.error {
+  background: var(--ma-error);
+}
+
+.myalert-btn.confirm.error:hover {
+  background: var(--ma-error-dark);
+  box-shadow: 0 8px 20px -6px var(--ma-error);
+}
+
+/* Button - Cancel */
+.myalert-btn.cancel {
+  background: var(--ma-border);
+  color: var(--ma-text-secondary);
+}
+
+.myalert-btn.cancel:hover {
+  background: var(--ma-text-secondary);
+  color: white;
+}
+
+.myalert-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background: var(--ma-info);
+  border-radius: 0 2px 0 0;
+  transition: width linear;
+}
+
+.myalert-progress.success {
+  background: var(--ma-success);
+}
+.myalert-progress.error {
+  background: var(--ma-error);
+}
+.myalert-progress.info {
+  background: var(--ma-info);
+}
+.myalert-progress.warning {
+  background: var(--ma-warning);
+}
+
+@media (max-width: 480px) {
+  .myalert-container {
+    max-width: 100%;
+    border-radius: var(--ma-radius-sm);
+  }
+
+  .myalert-icon-wrapper {
+    padding: 30px 24px 16px;
+  }
+
+  .myalert-icon {
+    width: 64px;
+    height: 64px;
+    font-size: 28px;
+  }
+
+  .myalert-content {
+    padding: 0 24px 20px;
+  }
+
+  .myalert-title {
+    font-size: 20px;
+  }
+
+  .myalert-message {
+    font-size: 14px;
+  }
+
+  .myalert-input-wrapper {
+    padding: 0 24px 10px;
+  }
+
+  .myalert-buttons {
+    padding: 0 24px 30px;
+    flex-direction: column;
+  }
+
+  .myalert-btn {
+    width: 100%;
+    padding: 16px 24px;
+  }
+}

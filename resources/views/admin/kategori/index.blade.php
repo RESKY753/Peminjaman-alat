@@ -3,7 +3,7 @@
 @section('content')
     <div class="space-y-6" x-data="{ openModal: false, editMode: false, namaKategori: '', keterangan: '' }">
 
-        <!-- Header Page & Tombol Tambah -->
+        {{-- Header Page & Tombol Tambah --}}
         @if (session('success'))
             <div
                 class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm p-4 rounded-xl flex items-center justify-between">
@@ -22,7 +22,7 @@
                 <p class="text-xs text-slate-500 mt-0.5">Pengelompokan jenis alat untuk memudahkan pencarian katalog.</p>
             </div>
 
-            <!-- Button Trigger Modal Tambah -->
+            {{-- Button Trigger Modal Tambah --}}
             <button @click="openModal = true; editMode = false; namaKategori = ''; keterangan = ''"
                 class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold transition flex items-center space-x-2 shadow-sm shadow-indigo-100">
                 <i class="fa-solid fa-plus"></i>
@@ -30,7 +30,7 @@
             </button>
         </div>
 
-        <!-- Tabel Data Kategori -->
+        {{-- Tabel Data Kategori --}}
         <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-slate-600">
@@ -46,13 +46,12 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100">
 
-                        <!-- Row 1 -->
+                        {{-- Row 1 --}}
                         @forelse ($kategori as $kat)
                             @php
                                 $isFalse = strtolower($kat->status_aktif) === 'false';
                             @endphp
-                            <tr
-                                class="transition {{ $isFalse ? 'bg-slate-100/80 text-slate-400' : 'hover:bg-slate-50/80' }}">
+                            <tr class="transition {{ $isFalse ? 'bg-slate-100/80 text-slate-400' : 'hover:bg-slate-50/80' }}">
                                 <td class="px-6 py-4 font-bold text-slate-400 text-xs">#KTG-0{{ $kat->id_kategori }}</td>
                                 <td class="px-6 py-4 font-bold text-slate-800">{{ ucfirst($kat->nama_kategori) }}</td>
                                 <td class="px-6 py-4 text-xs text-slate-500">{{ $kat->keterangan }}
@@ -79,10 +78,9 @@
                                             title="Edit Kategori">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </button>
-                                        <!-- Form Toggle Nonaktif / Pulihkan -->
+                                        {{-- Form Toggle Nonaktif / Pulihkan --}}
                                         @if ($isFalse)
-                                            <form action="{{ url('/admin/kategori/pulihkan/' . $kat->id_kategori) }}"
-                                                method="POST"
+                                            <form action="{{ url('/admin/kategori/pulihkan/' . $kat->id_kategori) }}" method="POST"
                                                 onsubmit="return confirm('Apakah kamu yakin ingin memulihkan kategori ini?')"
                                                 class="inline">
                                                 @csrf
@@ -94,8 +92,7 @@
                                                 </button>
                                             </form>
                                         @else
-                                            <form action="{{ url('/admin/kategori/nonaktif/' . $kat->id_kategori) }}"
-                                                method="POST"
+                                            <form action="{{ url('/admin/kategori/nonaktif/' . $kat->id_kategori) }}" method="POST"
                                                 onsubmit="return confirm('Apakah kamu yakin ingin menonaktifkan kategori ini?')"
                                                 class="inline">
                                                 @csrf
@@ -119,13 +116,13 @@
             </div>
         </div>
 
-        <!-- MODAL POPUP FORM (Create & Edit Kategori) -->
+        {{-- MODAL POPUP FORM (Create & Edit Kategori) --}}
         <div x-show="openModal"
             class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4"
             x-cloak>
             <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden transform transition-all">
 
-                <!-- Modal Header -->
+                {{-- Modal Header --}}
                 <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                     <h3 class="font-bold text-slate-800" x-text="editMode ? 'Ubah Data Kategori' : 'Tambah Kategori Baru'">
                     </h3>
@@ -134,18 +131,16 @@
                     </button>
                 </div>
 
-                <!-- Modal Form -->
-                <form
-                    :action="editMode ? '{{ url('/admin/kategori/update', '') }}/' + kategoriId :
-                        '{{ url('/admin/kategori/store') }}'"
-                    method="POST" class="p-6 space-y-4">
+                {{-- Modal Form --}}
+                <form :action="editMode ? '{{ url('/admin/kategori/update', '') }}/' + kategoriId :
+                            '{{ url('/admin/kategori/store') }}'" method="POST" class="p-6 space-y-4">
                     @csrf
 
                     <template x-if="editMode">
                         <input type="hidden" name="_method" value="PUT">
                     </template>
 
-                    <!-- Nama Kategori -->
+                    {{-- Nama Kategori --}}
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Kategori</label>
                         <input type="text" name="nama_kategori" x-model="namaKategori" required
@@ -153,23 +148,23 @@
                             oninput="this.setCustomValidity('')" placeholder="Contoh: Elektronik, Perkakas..."
                             class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         {{-- @error('nama_kategori')
-                                <div class="text-danger small mt-1 fw-bold">{{ $message }}</div>
-                            @enderror --}}
+                        <div class="text-danger small mt-1 fw-bold">{{ $message }}</div>
+                        @enderror --}}
                     </div>
 
-                    <!-- Keterangan / Deskripsi -->
+                    {{-- Keterangan / Deskripsi --}}
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Keterangan (Opsional)</label>
                         <textarea rows="3" name="keterangan" x-model="keterangan" required
-                            oninvalid="this.setCustomValidity('Keterangan wajib diisi!')" oninput="this.setCustomValidity('')"
-                            placeholder="Penjelasan singkat mengenai kategori ini..."
+                            oninvalid="this.setCustomValidity('Keterangan wajib diisi!')"
+                            oninput="this.setCustomValidity('')" placeholder="Penjelasan singkat mengenai kategori ini..."
                             class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
                         {{-- @error('keterangan')
-                                <div class="text-danger small mt-1 fw-bold">{{ $message }}</div>
-                            @enderror --}}
+                        <div class="text-danger small mt-1 fw-bold">{{ $message }}</div>
+                        @enderror --}}
                     </div>
 
-                    <!-- Footer Modal Buttons -->
+                    {{-- Footer Modal Buttons --}}
                     <div class="pt-4 flex justify-end space-x-2 border-t border-slate-100">
                         <button type="button" @click="openModal = false"
                             class="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-200 transition">

@@ -1,10 +1,10 @@
 @extends('Layouts.app')
 
 @section('content')
-    <!-- Bungkus seluruh halaman dengan Alpine.js data state untuk kontrol sidebar -->
+    {{-- Bungkus seluruh halaman dengan Alpine.js data state untuk kontrol sidebar --}}
     <div x-data="{ sidebarOpen: false }" class="relative min-h-screen bg-slate-50/50">
 
-        <!-- Notifikasi Sukses -->
+        {{-- Notifikasi Sukses --}}
         @if (session('success'))
             <div
                 class="my-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm p-4 rounded-xl flex items-center justify-between">
@@ -31,7 +31,7 @@
         @endif
 
         <div class="space-y-6">
-            <!-- Header & Filter Search -->
+            {{-- Header & Filter Search --}}
             <div
                 class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div class="flex items-center justify-between">
@@ -39,17 +39,17 @@
                         <h2 class="text-lg sm:text-xl font-bold text-slate-800">Katalog Alat & Barang</h2>
                         <p class="text-xs text-slate-500 mt-0.5">Pilih alat yang tersedia untuk diajukan peminjaman.</p>
                     </div>
-                    <!-- Tombol Toggle Sidebar untuk Mobile (Opsional jika layout pakai drawer) -->
+                    {{-- Tombol Toggle Sidebar untuk Mobile (Opsional jika layout pakai drawer) --}}
                     <button @click="sidebarOpen = !sidebarOpen"
                         class="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg">
                         <i class="fa-solid fa-bars text-base"></i>
                     </button>
                 </div>
 
-                <!-- Form Filter & Search Bar -->
+                {{-- Form Filter & Search Bar --}}
                 <form method="GET" action="{{ url('/peminjam/katalog') }}"
                     class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
-                    <!-- Filter Kategori -->
+                    {{-- Filter Kategori --}}
                     <select name="kategori" onchange="this.form.submit()"
                         class="w-full sm:w-auto px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
                         <option value="">Semua Kategori</option>
@@ -60,7 +60,7 @@
                         @endforeach
                     </select>
 
-                    <!-- Input Search -->
+                    {{-- Input Search --}}
                     <div class="flex items-center space-x-2 w-full sm:w-auto">
                         <div class="relative flex-1 sm:w-64">
                             <input type="text" name="search" value="{{ request('search') }}"
@@ -85,11 +85,11 @@
                 </form>
             </div>
 
-            <!-- Grid Card Daftar Barang yang Responsif -->
+            {{-- Grid Card Daftar Barang yang Responsif --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
                 @forelse ($alat as $item)
                     @if ($item->stok > 0)
-                        <!-- CARD ALAT (ADA STOK) -->
+                        {{-- CARD ALAT (ADA STOK) --}}
                         <div
                             class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between">
                             <div>
@@ -125,7 +125,7 @@
                             </div>
                         </div>
                     @else
-                        <!-- CARD ALAT (STOK HABIS) -->
+                        {{-- CARD ALAT (STOK HABIS) --}}
                         <div
                             class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm opacity-75 flex flex-col justify-between">
                             <div>
@@ -166,7 +166,7 @@
                 @endforelse
             </div>
 
-            <!-- AREA PAGINATION LINK -->
+            {{-- AREA PAGINATION LINK --}}
             @if (method_exists($alat, 'hasPages') && $alat->hasPages())
                 <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
                     {{ $alat->links() }}

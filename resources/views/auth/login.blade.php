@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-    <!-- Script AlpineJS Ditaruh di Head agar Langsung Aktif -->
+    {{-- Script AlpineJS Ditaruh di Head agar Langsung Aktif --}}
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
     <style>
@@ -28,12 +28,12 @@
 
     {{-- @dd(Auth::user()->role) --}}
 
-    <!-- Card Login Container -->
+    {{-- Card Login Container --}}
     <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-800">
 
-        <!-- Header Card -->
+        {{-- Header Card --}}
         <div class="bg-slate-900 p-8 text-center relative border-b border-slate-800">
-            <!-- Decorative Accent -->
+            {{-- Decorative Accent --}}
             <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
             </div>
 
@@ -45,11 +45,11 @@
             <p class="text-slate-400 text-xs mt-1">Sistem Peminjaman Inventaris Alat</p>
         </div>
 
-        <!-- Form Login (Deklarasi x-data di sini agar mencakup seluruh input) -->
+        {{-- Form Login (Deklarasi x-data di sini agar mencakup seluruh input) --}}
         <form action="{{ route('login.proses') }}" method="POST" x-data="{ showPassword: false }" class="p-8 space-y-5">
             @csrf
 
-            <!-- Pesan Error / Alert Global -->
+            {{-- Pesan Error / Alert Global --}}
             @if (session('error'))
                 <div
                     class="p-3 bg-rose-50 border border-rose-200 text-rose-600 rounded-lg text-xs font-semibold flex items-center space-x-2">
@@ -58,7 +58,7 @@
                 </div>
             @endif
 
-            <!-- Input Username / Email -->
+            {{-- Input Username / Email --}}
             <div>
                 <label for="email" class="block text-xs font-semibold text-slate-700 mb-1.5">Email / Username</label>
                 <div class="relative">
@@ -74,7 +74,7 @@
                 @enderror
             </div>
 
-            <!-- Input Password -->
+            {{-- Input Password --}}
             <div>
                 <label for="password" class="block text-xs font-semibold text-slate-700 mb-1.5">Password</label>
                 <div class="relative">
@@ -82,12 +82,12 @@
                         <i class="fa-solid fa-lock text-xs"></i>
                     </span>
 
-                    <!-- Buka / Tutup Intip Password memakai showPassword -->
+                    {{-- Buka / Tutup Intip Password memakai showPassword --}}
                     <input :type="showPassword ? 'text' : 'password'" id="password" name="password" required
                         placeholder="••••••••"
                         class="w-full pl-9 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
 
-                    <!-- Toggle Show/Hide Password -->
+                    {{-- Toggle Show/Hide Password --}}
                     <button type="button" @click="showPassword = !showPassword"
                         class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none">
                         <i class="fa-solid" :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
@@ -98,7 +98,7 @@
                 @enderror
             </div>
 
-            <!-- Remember Me -->
+            {{-- Remember Me --}}
             <div class="flex items-center justify-between text-xs">
                 <label class="flex items-center space-x-2 cursor-pointer">
                     <input type="checkbox" name="remember"
@@ -107,7 +107,7 @@
                 </label>
             </div>
 
-            <!-- Button Submit -->
+            {{-- Button Submit --}}
             <button type="submit"
                 class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition duration-200 flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/20">
                 <span>Masuk Ke Akun</span>
@@ -115,7 +115,7 @@
             </button>
         </form>
 
-        <!-- Footer Card -->
+        {{-- Footer Card --}}
         <div class="bg-slate-50 px-8 py-4 border-t border-slate-100 text-center">
             <p class="text-[11px] text-slate-400">
                 &copy; {{ date('Y') }} PinjamAlat. Hak Cipta Dilindungi.

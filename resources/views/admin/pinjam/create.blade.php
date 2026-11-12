@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="max-w-2xl mx-auto space-y-6">
-        <!-- Header Page -->
+        {{-- Header Page --}}
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
             <h2 class="text-xl font-bold text-slate-800">Form Pengajuan Peminjaman</h2>
             <p class="text-xs text-slate-500 mt-0.5">Lengkapi data di bawah ini untuk mengajukan peminjaman alat inventaris.
@@ -11,14 +11,13 @@
 
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
 
-            <!-- Informasi Detail Alat -->
+            {{-- Informasi Detail Alat --}}
             <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex items-start sm:items-center space-x-4">
                 @if ($alat->foto)
                     <img src="{{ asset('uploads/alat/' . $alat->foto) }}" alt="{{ $alat->nama_alat }}"
                         class="w-16 h-16 rounded-lg object-cover border border-slate-200 bg-white shrink-0">
                 @else
-                    <div
-                        class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center shrink-0">
+                    <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center shrink-0">
                         <i class="fa-solid fa-toolbox text-2xl"></i>
                     </div>
                 @endif
@@ -45,14 +44,14 @@
                     @endif
                 </div>
             </div>
-            <!-- Menampilkan pesan error stok (Session Alert) -->
+            {{-- Menampilkan pesan error stok (Session Alert) --}}
             @if (session('error'))
                 <div class="alert alert-danger">
                     {{ session('error') }}
                 </div>
             @endif
 
-            <!-- Menampilkan pesan error dari Validasi Input -->
+            {{-- Menampilkan pesan error dari Validasi Input --}}
             @if ($errors->any())
                 <div class="alert alert-danger">
                     <ul>
@@ -62,18 +61,18 @@
                     </ul>
                 </div>
             @endif
-            <!-- Form Pengajuan -->
+            {{-- Form Pengajuan --}}
             <form action="{{ url('/admin/pinjam/store') }}" method="POST" class="space-y-4"
                 onsubmit="this.querySelector('button[type=submit]').disabled = true;">
                 @csrf
                 <input type="hidden" name="id_alat" value="{{ $alat->id_alat }}">
                 <input type="hidden" name="tanggal_pinjam" value="{{ now()->toDateString() }}">
 
-                <!-- Input Jumlah Pinjam -->
+                {{-- Input Jumlah Pinjam --}}
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Jumlah Pinjam</label>
-                    <input type="number" name="jumlah"  max="{{ $alat->stok }}" min="1"
-                        value="{{ old('jumlah', 1) }}" required
+                    <input type="number" name="jumlah" max="{{ $alat->stok }}" min="1" value="{{ old('jumlah', 1) }}"
+                        required
                         class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('jumlah') border-red-500 focus:ring-red-500 @enderror"
                         placeholder="Masukkan jumlah yang ingin dipinjam">
 
@@ -83,18 +82,18 @@
                     <p class="text-[10px] text-slate-400 mt-1">*Maksimal peminjaman {{ $alat->stok }} unit sesuai
                         ketersediaan stok.</p>
                 </div>
-                <!-- Input Tanggal Rencana Kembali -->
+                {{-- Input Tanggal Rencana Kembali --}}
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Tanggal Rencana Kembali</label>
-                    <input type="date" name="tanggal_kembali" min="{{ date('Y-m-d') }}"
-                        value="{{ old('tanggal_kembali') }}" required
+                    <input type="date" name="tanggal_kembali" min="{{ date('Y-m-d') }}" value="{{ old('tanggal_kembali') }}"
+                        required
                         class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('tanggal_kembali') border-red-500 focus:ring-red-500 @enderror">
 
-                    <!-- Menampilkan pesan error khusus tanggal kembali -->
+                    {{-- Menampilkan pesan error khusus tanggal kembali --}}
                     @error('tanggal_kembali')
                         <p class="text-[10px] text-red-500 mt-1 font-medium">{{ $message }}</p>
                     @enderror
-                </div> <!-- Action Buttons -->
+                </div> {{-- Action Buttons --}}
                 <div class="pt-3 flex justify-end space-x-2 border-t border-slate-100">
                     <a href="{{ url('/admin/katalog') }}"
                         class="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-200 transition inline-flex items-center">

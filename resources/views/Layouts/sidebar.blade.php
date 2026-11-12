@@ -1,7 +1,7 @@
-<!-- Wrapper Induk Layout (DIKUNCI SAMA TINGGI LAYAR) -->
+{{-- Wrapper Induk Layout (DIKUNCI SAMA TINGGI LAYAR) --}}
 <div x-data="{ sidebarOpen: false }" class="relative h-screen w-screen overflow-hidden bg-slate-100 flex">
 
-    <!-- 1. OVERLAY MASK (Mobile Only) -->
+    {{-- 1. OVERLAY MASK (Mobile Only) --}}
     <div x-show="sidebarOpen" @click="sidebarOpen = false"
         x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0"
         x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300"
@@ -9,13 +9,13 @@
         class="fixed inset-0 bg-slate-900/60 z-40 md:hidden backdrop-blur-sm" x-cloak>
     </div>
 
-    <!-- 2. SIDEBAR (STAYS FIXED - TIDAK BERGERAK SAMA SEKALI) -->
+    {{-- 2. SIDEBAR (STAYS FIXED - TIDAK BERGERAK SAMA SEKALI) --}}
     <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
         class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-300 flex flex-col justify-between transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:z-auto shrink-0 h-screen">
 
-        <!-- Bagian Atas: Logo + Navigasi -->
+        {{-- Bagian Atas: Logo + Navigasi --}}
         <div class="flex flex-col flex-1 min-h-0">
-            <!-- Header Logo Sidebar -->
+            {{-- Header Logo Sidebar --}}
             <div class="h-16 flex items-center justify-between px-6 border-b border-slate-800 shrink-0">
                 <div class="flex items-center space-x-3">
                     <div
@@ -30,7 +30,7 @@
                 </button>
             </div>
 
-            <!-- Menu Navigasi (Bisa di-scroll jika menu terlalu banyak) -->
+            {{-- Menu Navigasi (Bisa di-scroll jika menu terlalu banyak) --}}
             <nav class="p-4 space-y-1 overflow-y-auto flex-1">
 
                 <a href="{{ url('/dashboard') }}"
@@ -156,11 +156,11 @@
             </nav>
         </div>
 
-        <!-- User Profile Info & Logout (TETAP DIAM DI POJOK KIRI BAWAH) -->
+        {{-- User Profile Info & Logout (TETAP DIAM DI POJOK KIRI BAWAH) --}}
         <div class="p-4 border-t border-slate-800 flex items-center justify-between bg-slate-900 shrink-0">
             <div class="flex items-center space-x-3 overflow-hidden">
                 @php
-                    $initial = strtoupper(substr(auth()->user()->username ?? 'U', 0, 1));
+$initial = strtoupper(substr(auth()->user()->username ?? 'U', 0, 1));
                 @endphp
                 <div
                     class="w-9 h-9 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs shadow-sm shrink-0">
@@ -173,7 +173,7 @@
                 </div>
             </div>
 
-            <form action="{{ route('logout') }}" method="POST" onsubmit="return confirm('Apakah kamu ingin logout?')">
+            <form action="{{ route('logout') }}" method="POST"  onsubmit="return konfirmasiSubmit(this, 'Apakah Kamu ingin logout?')">
                 @csrf
                 <button type="submit"
                     class="text-slate-400 hover:text-rose-400 p-2 rounded-lg hover:bg-slate-800 transition"
@@ -184,10 +184,10 @@
         </div>
     </aside>
 
-    <!-- 3. KONTEN UTAMA DI KANAN (HANYA BAGIAN INI YANG DI-SCROLL) -->
+    {{-- 3. KONTEN UTAMA DI KANAN (HANYA BAGIAN INI YANG DI-SCROLL) --}}
     <div class="flex-1 flex flex-col h-screen min-w-0 overflow-hidden">
 
-        <!-- Header Atas (STAYS FIXED - DIAM DI ATAS KONTEN) -->
+        {{-- Header Atas (STAYS FIXED - DIAM DI ATAS KONTEN) --}}
         <header
             class="h-16 bg-white border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between shrink-0 z-30 shadow-sm">
             <div class="flex items-center space-x-3">
@@ -204,7 +204,7 @@
             </span>
         </header>
 
-        <!-- Area Main Content (TABEL USER/DATA DI-SCROLL DI SINI) -->
+        {{-- Area Main Content (TABEL USER/DATA DI-SCROLL DI SINI) --}}
         <main class="p-4 sm:p-6 md:p-8 flex-1 overflow-y-auto">
             @yield('content')
         </main>

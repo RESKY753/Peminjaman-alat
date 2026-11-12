@@ -3,7 +3,7 @@
 @section('content')
     <div class="max-w-7xl mx-auto space-y-6">
 
-        <!-- Header Halaman -->
+        {{-- Header Halaman --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h1 class="text-xl font-bold text-slate-800">Histori Peminjaman</h1>
@@ -12,7 +12,7 @@
             </div>
         </div>
 
-        <!-- Tabel / Daftar Histori -->
+        {{-- Tabel / Daftar Histori --}}
         <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -38,8 +38,7 @@
                                     <div
                                         class="w-9 h-9 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden flex-shrink-0">
                                         <img src="{{ asset('uploads/alat/' . $item->peminjaman->alat->foto) }}"
-                                            alt="{{ $item->peminjaman->alat->namaAlat }}"
-                                            class="w-full h-full object-cover">
+                                            alt="{{ $item->peminjaman->alat->namaAlat }}" class="w-full h-full object-cover">
                                     </div>
                                     <span>{{ $item->peminjaman->alat->nama_alat }}</span>
                                 </td>

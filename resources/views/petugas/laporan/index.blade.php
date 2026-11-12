@@ -3,7 +3,7 @@
 @section('content')
     <div class="space-y-6">
 
-        <!-- CSS Khusus Mode Cetak -->
+        {{-- CSS Khusus Mode Cetak --}}
         <style>
             @media print {
 
@@ -26,33 +26,33 @@
             }
         </style>
 
-        <!-- Title Header -->
+        {{-- Title Header --}}
         <div class="bg-white p-5 rounded-xl border border-slate-200 no-print">
             <h2 class="text-xl font-bold text-slate-800">Cetak & Unduh Laporan Peminjaman</h2>
             <p class="text-xs text-slate-500">Filter berdasarkan rentang tanggal untuk pratinjau, cetak PDF, atau unduh ke
                 Excel.</p>
         </div>
 
-        <!-- Form Filter & Tombol Aksi -->
+        {{-- Form Filter & Tombol Aksi --}}
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm no-print">
             <form method="GET" action="{{ url('/petugas/laporan') }}"
                 class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
 
-                <!-- Input Tanggal Mulai -->
+                {{-- Input Tanggal Mulai --}}
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-2">Tanggal Mulai</label>
                     <input type="date" name="tgl_mulai" value="{{ request('tgl_mulai') }}"
                         class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
 
-                <!-- Input Tanggal Selesai -->
+                {{-- Input Tanggal Selesai --}}
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-2">Tanggal Selesai</label>
                     <input type="date" name="tgl_selesai" value="{{ request('tgl_selesai') }}"
                         class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
 
-                <!-- Tombol Submit Filter -->
+                {{-- Tombol Submit Filter --}}
                 <div>
                     <button type="submit"
                         class="w-full py-2 bg-slate-800 text-white rounded-lg text-xs font-semibold hover:bg-slate-700 transition flex items-center justify-center space-x-2">
@@ -61,7 +61,7 @@
                     </button>
                 </div>
 
-                <!-- Tombol Reset Filter -->
+                {{-- Tombol Reset Filter --}}
                 @if (request('tgl_mulai') || request('tgl_selesai'))
                     <div>
                         <a href="{{ url('/petugas/laporan') }}"
@@ -72,7 +72,7 @@
                     </div>
                 @endif
 
-                <!-- Tombol Print / PDF -->
+                {{-- Tombol Print / PDF --}}
                 <div>
                     <button type="button" onclick="window.print()"
                         class="w-full py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition flex items-center justify-center space-x-2 shadow-sm">
@@ -81,7 +81,7 @@
                     </button>
                 </div>
 
-                <!-- Tombol Download Excel -->
+                {{-- Tombol Download Excel --}}
                 <div>
                     <a href="{{ url('/petugas/laporan/excel?' . http_build_query(request()->all())) }}"
                         class="w-full py-2 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 transition flex items-center justify-center space-x-2 shadow-sm">
@@ -92,10 +92,10 @@
             </form>
         </div>
 
-        <!-- Area Tabel Laporan -->
+        {{-- Area Tabel Laporan --}}
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm print-area space-y-4">
 
-            <!-- Kop Laporan -->
+            {{-- Kop Laporan --}}
             <div class="text-center border-b pb-4 border-slate-200 space-y-1">
                 <h1 class="text-xl font-bold uppercase tracking-wider text-slate-800">Laporan Peminjaman Alat</h1>
                 <p class="text-xs text-slate-500">Sistem Informasi Inventory & Peminjaman Alat</p>
@@ -117,7 +117,7 @@
                 </p>
             </div>
 
-            <!-- Tabel Data Laporan -->
+            {{-- Tabel Data Laporan --}}
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs text-slate-600 border-collapse">
                     <thead>
@@ -135,7 +135,7 @@
 
                         @forelse ($laporan as $index => $item)
                             <tr>
-                                <!-- Nomor Urut Menyesuaikan Pagination (10 data per halaman) -->
+                                {{-- Nomor Urut Menyesuaikan Pagination (10 data per halaman) --}}
                                 <td class="px-4 py-3 border font-medium text-slate-800">
                                     {{ $laporan->firstItem() + $index }}
                                 </td>
@@ -173,12 +173,12 @@
                 </table>
             </div>
 
-            <!-- AREA PAGINATION (10 Data Per Halaman) -->
+            {{-- AREA PAGINATION (10 Data Per Halaman) --}}
             <div class="pt-4 no-print">
                 {{ $laporan->links() }}
             </div>
 
-            <!-- Kolom Tanda Tangan (Muncul hanya saat Print) -->
+            {{-- Kolom Tanda Tangan (Muncul hanya saat Print) --}}
             <div class="hidden print:flex justify-end pt-8">
                 <div class="text-center text-xs space-y-12">
                     <p>Petugas Penanggung Jawab,</p>

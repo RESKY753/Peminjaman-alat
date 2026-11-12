@@ -19,13 +19,13 @@
 <body class="bg-slate-50 flex items-center justify-center min-h-screen p-4">
 
     <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm max-w-md w-full text-center space-y-5">
-        <!-- Icon Peringatan -->
+        {{-- Icon Peringatan --}}
         <div
             class="w-16 h-16 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto text-2xl border border-rose-100 shadow-inner">
             <i class="fa-solid fa-ban"></i>
         </div>
 
-        <!-- Teks Informasi -->
+        {{-- Teks Informasi --}}
         <div class="space-y-1">
             <h1 class="text-xl font-bold text-slate-800">Akses Ditolak (403)</h1>
             <p class="text-xs text-slate-500 leading-relaxed">
@@ -33,13 +33,13 @@
             </p>
         </div>
 
-        <!-- Pesan Hitung Mundur -->
+        {{-- Pesan Hitung Mundur --}}
         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs text-slate-600">
             Otomatis kembali ke halaman login dalam <span id="countdown" class="font-bold text-indigo-600">10</span>
             detik...
         </div>
 
-        <!-- Tombol Aksi -->
+        {{-- Tombol Aksi --}}
         <div class="pt-2 flex flex-col sm:flex-row gap-2">
             <a href="{{ url('/force-logout') }}"
                 class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition shadow-sm shadow-indigo-100 flex items-center justify-center space-x-2">
@@ -49,8 +49,8 @@
         </div>
     </div>
 
-    <!-- Script Hitung Mundur 10 Detik -->
-    <!-- Script Hitung Mundur 10 Detik & Hapus Session -->
+    {{-- Script Hitung Mundur 10 Detik --}}
+    {{-- Script Hitung Mundur 10 Detik & Hapus Session --}}
     <script>
         let timeLeft = 10;
         const countdownEl = document.getElementById('countdown');

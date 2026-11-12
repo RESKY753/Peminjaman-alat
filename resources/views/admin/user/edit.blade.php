@@ -18,7 +18,7 @@
                 @csrf
                 @method('PUT')
 
-                <!-- Username -->
+                {{--  Username  --}}
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Username</label>
                     <input type="text" name="username" value="{{ old('username', $user->username) }}"
@@ -28,7 +28,7 @@
                     @enderror
                 </div>
 
-                <!-- Email -->
+                {{--  Email  --}}
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
                     <input type="email" name="email" value="{{ old('email', $user->email) }}"
@@ -38,7 +38,7 @@
                     @enderror
                 </div>
 
-                <!-- Telp -->
+                {{--  Telp  --}}
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Telp</label>
                     <input type="tel" name="telp" value="{{ old('telp', $user->telp) }}" maxlength="12"
@@ -49,7 +49,7 @@
                     @enderror
                 </div>
 
-                <!-- Password -->
+                {{--  Password  --}}
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
                     <input type="password" name="password" placeholder="••••••••"
@@ -60,7 +60,7 @@
                     @enderror
                 </div>
 
-                <!-- Role / Hak Akses -->
+                {{--  Role / Hak Akses  --}}
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Role / Hak Akses</label>
                     <select name="role"
@@ -75,7 +75,7 @@
                     @enderror
                 </div>
 
-                <!-- Footer Buttons -->
+                {{--  Footer Buttons  --}}
                 <div class="pt-4 flex justify-end space-x-2 border-t border-slate-100">
                     <a href="{{ url('/admin/user') }}"
                         class="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-200 transition">

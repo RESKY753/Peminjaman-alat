@@ -19,14 +19,14 @@
                 @csrf
                 @method('PUT')
 
-                <!-- Nama Alat -->
+                {{--  Nama Alat  --}}
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Alat</label>
                     <input type="text" value="{{ $alat->nama_alat }}" name="nama_alat" required
                         class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
 
-                <!-- Kategori & Stok -->
+                {{--  Kategori & Stok  --}}
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Kategori</label>
@@ -48,7 +48,7 @@
                     </div>
                 </div>
 
-                <!-- Kondisi Alat -->
+                {{--  Kondisi Alat  --}}
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Kondisi Alat</label>
                     <select name="kondisi" required
@@ -61,14 +61,14 @@
                     </select>
                 </div>
 
-                <!-- Spesifikasi -->
+                {{--  Spesifikasi  --}}
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Spesifikasi</label>
                     <textarea rows="3" name="spesifikasi" required
                         class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ $alat->spesifikasi }}</textarea>
                 </div>
 
-                <!-- Upload Foto -->
+                {{--  Upload Foto  --}}
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Upload Foto Alat</label>
                     <input type="file" name="foto"
@@ -76,7 +76,7 @@
                     <p class="text-[10px] text-slate-400 mt-1">*Kosongkan jika tidak ingin mengubah foto alat.</p>
                 </div>
 
-                <!-- Submit Button -->
+                {{--  Submit Button  --}}
                 <div class="pt-4 flex justify-end space-x-2 border-t border-slate-100">
                     <a href="{{ url('/admin/alat') }}"
                         class="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-200 transition">

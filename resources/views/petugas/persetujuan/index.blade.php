@@ -3,35 +3,9 @@
 @section('content')
     <div class="space-y-6">
 
-        {{-- @dd(Auth::user()->role) --}}
 
-        <!-- Flash Message Success -->
-        @if (session('success'))
-            <div
-                class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm p-4 rounded-xl flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <i class="fas fa-check-circle"></i>
-                    <span>{{ session('success') }}</span>
-                </div>
-                <button onclick="this.parentElement.remove()" class="text-emerald-400 hover:text-emerald-200">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        @endif
-        @if (session('error'))
-            <div
-                class="my-4 bg-rose-500/10 border border-rose-500/30 text-rose-400 text-sm p-4 rounded-xl flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span>{{ session('error') }}</span>
-                </div>
-                <button onclick="this.parentElement.remove()" class="text-rose-400 hover:text-rose-200">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        @endif
 
-        <!-- Header Page -->
+        {{--  Header Page  --}}
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
             <div>
                 <h2 class="text-xl font-bold text-slate-800">Persetujuan Peminjaman</h2>
@@ -39,7 +13,51 @@
             </div>
         </div>
 
-        <!-- Tabel Data Persetujuan -->
+        {{-- Form Filter & Tombol Aksi --}}
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm no-print">
+            <form method="GET" action="{{ url('/petugas/persetujuan') }}"
+                class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+
+                {{-- Tanggal Pinjam --}}
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-2">Tanggal Pinjam</label>
+                    <input type="date" name="tgl_pinjam" value="{{ request('tgl_pinjam') }}"
+                        class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                {{-- Tanggal Kembali --}}
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-2">Tanggal Kembali</label>
+                    <input type="date" name="tgl_kembali" value="{{ request('tgl_kembali') }}"
+                        class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                {{-- Tombol Filter --}}
+                <div>
+                    <button type="submit"
+                        class="w-full py-2 bg-slate-800 text-white rounded-lg text-xs font-semibold hover:bg-slate-700 transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-filter"></i>
+                        <span>Filter</span>
+                    </button>
+                </div>
+
+                {{-- Tombol Reset (hanya muncul kalau filter aktif) --}}
+                @if (request('tgl_pinjam') || request('tgl_kembali'))
+                    <div>
+                        <a href="{{ url('/petugas/persetujuan') }}"
+                            class="w-full py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-200 transition flex items-center justify-center space-x-1">
+                            <i class="fa-solid fa-rotate-left"></i>
+                            <span>Reset</span>
+                        </a>
+                    </div>
+                @endif
+            </form>
+        </div>
+
+
+
+
+        {{--  Tabel Data Persetujuan  --}}
         <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-slate-600">
@@ -63,12 +81,12 @@
                                 $idPeminjaman = $item->id_peminjaman ?? $item->id;
                             @endphp
                             <tr class="hover:bg-slate-50/80 transition">
-                                <!-- Nama Peminjam -->
+                                {{--  Nama Peminjam  --}}
                                 <td class="px-6 py-4 font-bold text-slate-800">
                                     {{ $item->username ?? ($item->user->username ?? '-') }}
                                 </td>
 
-                                <!-- Nama Alat & Jumlah -->
+                                {{--  Nama Alat & Jumlah  --}}
                                 <td class="px-6 py-4">
                                     <p class="font-semibold text-slate-700">
                                         {{ $item->nama_alat ?? ($item->alat->nama_alat ?? '-') }}</p>
@@ -79,17 +97,17 @@
                                         {{ $item->jaminan }}</p>
                                 </td>
 
-                                <!-- Tanggal Pinjam -->
+                                {{--  Tanggal Pinjam  --}}
                                 <td class="px-6 py-4 text-xs text-slate-600">
                                     {{ \Carbon\Carbon::parse($item->tanggal_pinjam)->locale('id')->isoFormat('dddd, D MMMM YYYY') }}
                                 </td>
 
-                                <!-- Batas Kembali -->
+                                {{--  Batas Kembali  --}}
                                 <td class="px-6 py-4 text-xs font-semibold text-rose-600">
                                     {{ \Carbon\Carbon::parse($item->tanggal_kembali)->locale('id')->isoFormat('dddd, D MMMM YYYY') }}
                                 </td>
 
-                                <!-- Badge Status -->
+                                {{--  Badge Status  --}}
                                 <td class="px-6 py-4">
                                     @switch($status)
                                         @case('ajukan peminjaman')
@@ -144,28 +162,30 @@
                                     @endswitch
                                 </td>
 
-                                <!-- Aksi Konfirmasi (LOGIKA TOMBOL BARU) -->
+                                {{--  Aksi Konfirmasi (LOGIKA TOMBOL BARU)  --}}
                                 <td class="px-6 py-4 text-center">
                                     <div class="flex items-center justify-center space-x-2">
 
                                         @switch($status)
                                             {{-- 1. Status 'ajukan peminjaman': Setuju (dipinjam) & Tolak (ditolak) --}}
                                             @case('ajukan peminjaman')
-                                                <!-- Form Setujui -> value dipinjam -->
-                                                <form action="{{ url('/petugas/persetujuan/update/' . $idPeminjaman) }}"
+                                                {{--  Form Setujui -> value dipinjam  --}}
+                                                <form id="formSetuju{{ $idPeminjaman }}"
+                                                    action="{{ url('/petugas/persetujuan/update/' . $idPeminjaman) }}"
                                                     method="POST" class="inline">
                                                     @csrf
                                                     @method('PUT')
                                                     <input type="hidden" name="status" value="dipinjam">
-                                                    <button type="submit" onclick="return confirm('Setujui peminjaman alat ini?')"
+                                                    <button type="button"
+                                                        onclick="konfirmasiProses('formSetuju{{ $idPeminjaman }}', 'Setujui peminjaman alat ini?')"
                                                         class="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition flex items-center space-x-1 shadow-sm">
                                                         <i class="fa-solid fa-check"></i>
                                                         <span>Setujui</span>
                                                     </button>
                                                 </form>
 
-                                                <!-- Form Tolak -> value ditolak -->
-                                                <!-- Form Tolak -> Memicu Modal Alasan -->
+                                                {{--  Form Tolak -> value ditolak  --}}
+                                                {{--  Form Tolak -> Memicu Modal Alasan  --}}
                                                 <button type="button"
                                                     onclick="bukaModalTolak('{{ url('/petugas/persetujuan/update/' . $idPeminjaman) }}', 'ditolak')"
                                                     class="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-semibold hover:bg-rose-700 transition flex items-center space-x-1 shadow-sm">
@@ -176,7 +196,8 @@
 
                                             {{-- 2. Status 'dipinjam': Kosong / Tidak ada tombol aksi --}}
                                             @case('dipinjam')
-                                                <span class="text-xs text-slate-400 font-medium italic">- Sedang Dipinjam -</span>
+                                                <span class="text-xs text-slate-400 font-medium italic">- Sedang Dipinjam
+                                                    -</span>
                                             @break
 
                                             {{-- 3. Status 'ajukan kembali' / 'ajukan pengembalian': Setujui -> value dikembalikan --}}
@@ -188,13 +209,13 @@
                                                     @method('PUT')
                                                     <input type="hidden" name="status" value="dikembalikan">
                                                     <button type="submit"
-                                                        onclick="return confirm('Konfirmasi pengembalian alat ini?')"
+                                                        onclick=" return konfirmasiForm(this, 'Setujui pengembalian ulang untuk alat ini?')"
                                                         class="px-3.5 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 transition flex items-center space-x-1.5 shadow-sm">
                                                         <i class="fa-solid fa-circle-check"></i>
                                                         <span>Setujui Pengembalian</span>
                                                     </button>
                                                 </form>
-                                                <!-- Form Tolak -> Memicu Modal Alasan -->
+                                                {{--  Form Tolak -> Memicu Modal Alasan  --}}
                                                 <button type="button"
                                                     onclick="bukaModalTolak('{{ url('/petugas/persetujuan/update/' . $idPeminjaman) }}', 'pengembalian ditolak')"
                                                     class="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-semibold hover:bg-rose-700 transition flex items-center space-x-1 shadow-sm">
@@ -227,7 +248,7 @@
             </div>
         </div>
 
-        <!-- Modal Pop-Up Alasan Penolakan -->
+        {{--  Modal Pop-Up Alasan Penolakan  --}}
         <div id="modalTolak" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden">
             <div class="bg-white w-full max-w-md p-6 rounded-2xl shadow-xl space-y-4">
                 <div class="flex justify-between items-center">
@@ -237,7 +258,7 @@
                     </button>
                 </div>
 
-                <!-- Form yang akan dikirim ke Controller -->
+                {{--  Form yang akan dikirim ke Controller  --}}
                 <form id="formTolak" method="POST" class="space-y-4">
                     @csrf
                     @method('PUT')
@@ -245,12 +266,12 @@
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Masukkan alasan penolakan:</label>
-                        <!-- Tambahkan old('alasan') di dalam tag textarea -->
+                        {{--  Tambahkan old('alasan') di dalam tag textarea  --}}
                         <textarea name="alasan" rows="4" required
                             class="w-full text-sm border border-slate-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-rose-500"
                             placeholder="Contoh: Stok alat habis / Jaminan tidak valid...">{{ old('alasan') }}</textarea>
 
-                        <!-- TAMBAHKAN KODE INI UNTUK MEMUNCULKAN PESAN ERROR MERAH -->
+                        {{--  TAMBAHKAN KODE INI UNTUK MEMUNCULKAN PESAN ERROR MERAH  --}}
                         @error('alasan')
                             <span class="text-xs font-semibold text-rose-500 mt-1 block">* {{ $message }}</span>
                         @enderror
@@ -270,7 +291,7 @@
             </div>
         </div>
 
-        <!-- JavaScript untuk Mengontrol Modal -->
+        {{--  JavaScript untuk Mengontrol Modal  --}}
         <script>
             function bukaModalTolak(urlAction, statusValue) {
                 const modal = document.getElementById('modalTolak');
@@ -293,7 +314,7 @@
             }
         </script>
 
-        <!-- SCRIPT TAMBAHAN: BUKA OTOMATIS JIKA ADA ERROR VALIDASI -->
+        {{--  SCRIPT TAMBAHAN: BUKA OTOMATIS JIKA ADA ERROR VALIDASI  --}}
         @if ($errors->has('alasan'))
             <script>
                 document.addEventListener("DOMContentLoaded", function() {

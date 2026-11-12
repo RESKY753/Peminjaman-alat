@@ -15,7 +15,7 @@
     @endif
 
     <div class="space-y-6">
-        <!-- Header Page -->
+        {{--  Header Page  --}}
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
             <div>
                 <h2 class="text-xl font-bold text-slate-800">Pinjaman Saya</h2>
@@ -28,7 +28,7 @@
             </a>
         </div>
 
-        <!-- Cards Grid Peminjaman -->
+        {{--  Cards Grid Peminjaman  --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             @forelse ($pinjamanSaya as $item)
                 @php
@@ -41,12 +41,12 @@
                     $idPeminjaman = $item->id_peminjaman ?? $item->id;
                 @endphp
 
-                <!-- Card Item Pinjaman -->
+                {{--  Card Item Pinjaman  --}}
                 <div
                     class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-4">
                     <div class="space-y-4">
 
-                        <!-- Top Header Card: Foto & Info Utama -->
+                        {{--  Top Header Card: Foto & Info Utama  --}}
                         <div class="flex items-start space-x-3.5">
                             @if ($fotoAlat)
                                 <img src="{{ asset('uploads/alat/' . $fotoAlat) }}" alt="{{ $namaAlat }}"
@@ -69,7 +69,7 @@
                             </div>
                         </div>
 
-                        <!-- Badge Status -->
+                        {{--  Badge Status  --}}
                         <div>
                             @switch($status)
                                 @case('ajukan peminjaman')
@@ -124,7 +124,7 @@
                             @endswitch
                         </div>
 
-                        <!-- Panel Detail Informasi Tanggal & Kondisi -->
+                        {{--  Panel Detail Informasi Tanggal & Kondisi  --}}
                         <div class="bg-slate-50 p-3.5 rounded-xl text-xs space-y-2 text-slate-600 border border-slate-100">
                             <div class="flex justify-between items-center">
                                 <span class="text-slate-500">Jumlah Pinjam:</span>
@@ -195,7 +195,7 @@
 
                     </div>
 
-                    <!-- TOMBOL AKSI DI BAGIAN BAWAH -->
+                    {{--  TOMBOL AKSI DI BAGIAN BAWAH  --}}
                     <div class="pt-2">
                         @switch($status)
                             @case('dipinjam')
@@ -204,7 +204,8 @@
                                     @csrf
                                     @method('PUT')
                                     <input type="hidden" name="status" value="ajukan kembali">
-                                    <button type="submit" onclick="return confirm('Ajukan pengembalian ulang untuk alat ini?')"
+                                    <button type="submit"
+                                        onclick="konfirmasiForm(this, 'Ajukan pengembalian ulang untuk alat ini?')"
                                         class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-1.5 shadow-sm">
                                         <i class="fa-solid fa-rotate-left"></i>
                                         <span>Ajukan Pengembalian Ulang</span>
