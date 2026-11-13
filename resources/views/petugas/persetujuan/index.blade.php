@@ -17,6 +17,7 @@
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm no-print">
             <form method="GET" action="{{ url('/petugas/persetujuan') }}"
                 class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+                <input type="hidden" name="tab" value="{{ $tab }}">
 
                 {{-- Tanggal Pinjam --}}
                 <div>
@@ -44,7 +45,7 @@
                 {{-- Tombol Reset (hanya muncul kalau filter aktif) --}}
                 @if (request('tgl_pinjam') || request('tgl_kembali'))
                     <div>
-                        <a href="{{ url('/petugas/persetujuan') }}"
+                        <a href="{{ url('/petugas/persetujuan?tab=' . $tab) }}"
                             class="w-full py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-200 transition flex items-center justify-center space-x-1">
                             <i class="fa-solid fa-rotate-left"></i>
                             <span>Reset</span>
@@ -55,7 +56,25 @@
         </div>
 
 
+        {{-- Tab Navigasi --}}
+        @php
+            $queryTanggal = request()->only(['tgl_pinjam', 'tgl_kembali']);
+        @endphp
+        <div class="flex space-x-2 border-b border-slate-200">
+            <a href="{{ url('/petugas/persetujuan') . '?' . http_build_query($queryTanggal + ['tab' => 'konfirmasi']) }}"
+                class="px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition flex items-center space-x-2
+        {{ $tab === 'konfirmasi' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}">
+                <i class="fa-solid fa-hourglass-half"></i>
+                <span>Menunggu Konfirmasi</span>
+            </a>
 
+            <a href="{{ url('/petugas/persetujuan') . '?' . http_build_query($queryTanggal + ['tab' => 'dipinjam']) }}"
+                class="px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition flex items-center space-x-2
+        {{ $tab === 'dipinjam' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}">
+                <i class="fa-solid fa-box-open"></i>
+                <span>Sedang Dipinjam</span>
+            </a>
+        </div>
 
         {{--  Tabel Data Persetujuan  --}}
         <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
@@ -202,7 +221,6 @@
 
                                             {{-- 3. Status 'ajukan kembali' / 'ajukan pengembalian': Setujui -> value dikembalikan --}}
                                             @case('ajukan kembali')
-                                            @case('ajukan pengembalian')
                                                 <form action="{{ url('/petugas/persetujuan/update/' . $idPeminjaman) }}"
                                                     method="POST" class="inline">
                                                     @csrf
@@ -236,14 +254,20 @@
                             </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="px-6 py-8 text-center text-xs text-slate-400">
-                                        Belum ada pengajuan peminjaman untuk dikonfirmasi.
+                                    <td colspan="7" class="px-6 py-8 text-center text-xs text-slate-400">
+                                        {{ $tab === 'dipinjam'
+                                            ? 'Belum ada data peminjaman yang sedang berjalan.'
+                                            : 'Tidak ada pengajuan yang perlu dikonfirmasi.' }}
                                     </td>
                                 </tr>
                             @endforelse
-
                         </tbody>
                     </table>
+                    @if (method_exists($persetujuan, 'hasPages') && $persetujuan->hasPages())
+                        <div class="p-4 border-t border-slate-100 bg-slate-50/50">
+                            {{ $persetujuan->links() }}
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

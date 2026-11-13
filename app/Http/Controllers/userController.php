@@ -32,7 +32,7 @@ class userController extends Controller
             ->count();
 
         $pendingCount = Peminjaman::whereNotIn('status', ['dikembalikan', 'dipinjam', 'ditolak', 'pengembalian ditolak'])->count();
-        $activePinjamCount = Peminjaman::where('status', ['dipinjam'])->count();
+        $activePinjamCount = Peminjaman::whereIn('status', ['dipinjam', 'pengembalian ditolak' ])->count();
         $totalPeminjam = Peminjaman::whereNotIn('status', ['ditolak', 'dikembalikan'])->count();
 
         return view('Layouts.dashboard', compact('totalAlat', 'totalUser', 'totalKategori', 'totalLog', 'myPinjamanCount', 'katalogCount', 'pendingCount', 'activePinjamCount', 'totalPeminjam'));

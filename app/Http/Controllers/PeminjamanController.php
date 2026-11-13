@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+use Log;
 use function Laravel\Prompts\table;
 
 class PeminjamanController extends Controller
@@ -28,11 +29,22 @@ class PeminjamanController extends Controller
 
     function indexPersetujuan(Request $request)
     {
+        // untuk tab
+        // Ambil nilai ?tab= dari URL. Kalau gak ada, tab awal adalah 'konfirmasi'
+        $tab = $request->query('tab', 'konfirmasi');
+
+        // Tentukan daftar status sesuai tab yang dipilih
+        // Tab 'dipinjam'   : transaksi yang sudah diproses petugas
+        // Tab 'konfirmasi' : pengajuan yang menunggu keputusan petugas
+        $statusTab = $tab === 'dipinjam' ? ['dipinjam', 'pengembalian ditolak'] : ['ajukan peminjaman', 'ajukan kembali'];
+
         $persetujuan = DB::table('peminjaman')
             ->join('users', 'peminjaman.id_user', '=', 'users.id_user')
             ->join('alat', 'peminjaman.id_alat', '=', 'alat.id_alat')
             ->select('peminjaman.id_peminjaman', 'peminjaman.jumlah', 'peminjaman.jaminan', 'users.username', 'alat.nama_alat', 'peminjaman.tanggal_pinjam', 'peminjaman.tanggal_kembali', 'peminjaman.status')
-            ->whereIn('peminjaman.status', ['ajukan peminjaman', 'dipinjam', 'ajukan kembali', 'pengembalian ditolak'])
+
+            //   ambil data yang statusnya ada di daftar tab aktif
+            ->whereIn('peminjaman.status', $statusTab)
 
             ->when($request->filled('tgl_pinjam'), function ($query) use ($request) {
                 $query->whereDate('peminjaman.tanggal_pinjam', '=', $request->tgl_pinjam);
@@ -41,9 +53,10 @@ class PeminjamanController extends Controller
                 $query->whereDate('peminjaman.tanggal_kembali', '=', $request->tgl_kembali);
             })
             ->orderBy('peminjaman.tanggal_kembali', 'desc')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('petugas.persetujuan.index', compact('persetujuan'));
+        return view('petugas.persetujuan.index', compact('persetujuan', 'tab'));
     }
 
     function indexDaftarPeminjam()
@@ -265,6 +278,8 @@ class PeminjamanController extends Controller
      */
     public function updatePersetujuan(Request $request, $id)
     {
+
+    
         // 1. Ambil data peminjaman
         $peminjaman = Peminjaman::findOrFail($id);
 
@@ -307,7 +322,7 @@ class PeminjamanController extends Controller
             $alat->decrement('stok', $peminjaman->jumlah);
 
             // JIKA DISETUJUI PENGEMBALIAN (ajukan kembali / ajukan pengembalian -> dikembalikan)
-        } elseif ($statusBaru == 'dikembalikan' && in_array($statusLama, ['ajukan kembali', 'ajukan pengembalian'])) {
+        } elseif ($statusBaru == 'dikembalikan' && in_array($statusLama, ['ajukan kembali'])) {
             // TAMBAH KEMBALI STOK
             $alat->increment('stok', $peminjaman->jumlah);
             //tambah data di tabel histori
@@ -321,6 +336,10 @@ class PeminjamanController extends Controller
 
             // 2. Catat log aktivitas (sekarang $user sudah terdefinisi)
             LogAktivitas::catat('Menyetujui pengembalian', $user->username . ', Menyetujui pengembalian:' . $id);
+        } elseif ($statusLama == 'ajukan kembali' && $statusBaru == 'pengembalian ditolak') {
+            $user = Auth::user();
+
+            LogAktivitas::catat('Menolak Pengembalian', $user->username . ', Menolak pengembalian:' . $id);
         } else {
             $user = Auth::user();
 
