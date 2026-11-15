@@ -119,6 +119,8 @@ class PeminjamanController extends Controller
         $alat = Alat::findOrFail($id);
         if ($alat->status_alat == 'false') {
             return redirect('/peminjam/katalog')->with('error', 'alat tidak ada');
+        } elseif ($alat->stok == 0) {
+            return redirect('/peminjam/katalog')->with('error', 'stok alat telah habis');
         } else {
             $alat = Alat::join('kategori', 'alat.id_kategori', '=', 'kategori.id_kategori')
                 ->select('alat.id_alat', 'alat.nama_alat', 'alat.foto', 'alat.spesifikasi', 'alat.stok', 'alat.kondisi', 'kategori.nama_kategori')
@@ -133,6 +135,8 @@ class PeminjamanController extends Controller
         $alat = Alat::findOrFail($id);
         if ($alat->status_alat == 'false') {
             return redirect('/admin/katalog')->with('error', 'alat tidak ada');
+        } elseif ($alat->stok == 0) {
+            return redirect('/admin/katalog')->with('error', 'stok alat telah habis');
         } else {
             $alat = Alat::join('kategori', 'alat.id_kategori', '=', 'kategori.id_kategori')
                 ->select('alat.id_alat', 'alat.nama_alat', 'alat.foto', 'alat.spesifikasi', 'alat.stok', 'alat.kondisi', 'kategori.nama_kategori')
@@ -153,6 +157,10 @@ class PeminjamanController extends Controller
         $alat = Alat::find($request->id_alat);
 
         $maxStok = $alat ? $alat->stok : 0;
+
+        if ($alat->status_alat == 'false') {
+            return redirect('/peminjam/katalog')->with('error', 'alat tidak ada');
+        }
 
         $request->validate(
             [
@@ -179,10 +187,6 @@ class PeminjamanController extends Controller
         //     return redirect()->back()->with('error', 'Stok alat tidak mencukupi.');
         // }
 
-        // $alat->update([
-        //     'stok' => $alat->stok - $request->jumlah,
-        // ]);
-
         Peminjaman::create([
             'id_alat' => $request->id_alat,
             'id_user' => $id_user,
@@ -202,10 +206,18 @@ class PeminjamanController extends Controller
     {
         $id_user = Auth::id();
 
+        $alat = Alat::find($request->id_alat);
+
+        $maxStok = $alat ? $alat->stok : 0;
+
+        if ($alat->status_alat == 'false') {
+            return redirect('/admin/katalog')->with('error', 'alat tidak ada');
+        }
+
         $request->validate(
             [
                 'id_alat' => 'required',
-                'jumlah' => 'required|integer|min:1',
+                'jumlah' => 'required|integer|min:1|max:' . $maxStok,
                 'tanggal_pinjam' => 'required|date',
                 'tanggal_kembali' => 'required|date|after_or_equal:tanggal_pinjam',
             ],
@@ -214,6 +226,7 @@ class PeminjamanController extends Controller
                 'jumlah.required' => 'Jumlah pinjam wajib diisi.',
                 'jumlah.integer' => 'Jumlah pinjam harus berupa angka bulat.',
                 'jumlah.min' => 'Jumlah pinjam minimal adalah 1.',
+                'jumlah.max' => 'Jumlah pinjam maksimal adalah' . $maxStok,
                 'tanggal_pinjam.required' => 'Tanggal pinjam wajib diisi.',
                 'tanggal_pinjam.date' => 'Format tanggal pinjam tidak valid.',
                 'tanggal_kembali.required' => 'Tanggal kembali wajib diisi.',
@@ -222,10 +235,15 @@ class PeminjamanController extends Controller
             ],
         );
 
+        // if ($alat->stok < $request->jumlah) {
+        //     return redirect()->back()->with('error', 'Stok alat tidak mencukupi.');
+        // }
+
         Peminjaman::create([
             'id_alat' => $request->id_alat,
             'id_user' => $id_user,
             'jumlah' => $request->jumlah,
+            'jaminan' => 'tidak ada jaminan',
             'tanggal_pinjam' => $request->tanggal_pinjam,
             'tanggal_kembali' => $request->tanggal_kembali,
         ]);
@@ -278,8 +296,6 @@ class PeminjamanController extends Controller
      */
     public function updatePersetujuan(Request $request, $id)
     {
-
-    
         // 1. Ambil data peminjaman
         $peminjaman = Peminjaman::findOrFail($id);
 

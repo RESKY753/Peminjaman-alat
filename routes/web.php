@@ -73,6 +73,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/petugas/persetujuan', [PeminjamanController::class, 'indexPersetujuan'])->name('dpetugas');
         Route::put('/petugas/persetujuan/update/{id}', [PeminjamanController::class, 'updatePersetujuan']);
         Route::get('/petugas/laporan', [LaporanController::class, 'index']);
+        Route::get('/petugas/laporan/pdf', [LaporanController::class, 'cetakPdf'])->name('petugas.laporan.pdf');
         Route::get('/petugas/laporan/excel', [LaporanController::class, 'exportExcel']);
         Route::get('/petugas/daftar', [PeminjamanController::class, 'indexDaftarPeminjam']);
     });

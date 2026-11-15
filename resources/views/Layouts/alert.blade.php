@@ -1,6 +1,6 @@
 @if (session('success'))
     <script>
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             const pesan = @json(session('success'));
             if (typeof MyAlert !== 'undefined') {
                 MyAlert.show({
@@ -18,7 +18,7 @@
 
 @if (session('error'))
     <script>
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             const pesan = @json(session('error'));
             if (typeof MyAlert !== 'undefined') {
                 MyAlert.show({
@@ -40,7 +40,7 @@
         const form = document.getElementById(formId);
         if (!form || sedangSubmit) return;
 
-        const kirim = function() {
+        const kirim = function () {
             sedangSubmit = true;
             form.submit();
         };
@@ -51,7 +51,7 @@
                 title: 'Konfirmasi',
                 message: pesan,
                 showCancel: true,
-                confirmText: 'Ya, Lanjutkan',
+                confirmText: 'Ya',
                 cancelText: 'Batal',
                 onConfirm: kirim
             });
@@ -77,9 +77,9 @@
                 title: 'Konfirmasi',
                 message: pesan,
                 showCancel: true,
-                confirmText: 'Ya, Lanjutkan',
+                confirmText: 'Ya',
                 cancelText: 'Batal',
-                onConfirm: function() {
+                onConfirm: function () {
                     form.dataset.sudahKonfirmasi = '1'; // cegah submit ganda
                     form.submit(); // tidak memicu onsubmit lagi
                 }
@@ -107,9 +107,9 @@
                 title: 'Konfirmasi',
                 message: pesan,
                 showCancel: true,
-                confirmText: 'Ya, Lanjutkan',
+                confirmText: 'Ya',
                 cancelText: 'Batal',
-                onConfirm: function() {
+                onConfirm: function () {
                     form.dataset.sudahKonfirmasi = '1'; // cegah submit ganda
                     form.submit(); // tidak memicu onsubmit lagi
                 }
@@ -130,9 +130,9 @@
                 title: 'Konfirmasi',
                 message: pesan,
                 showCancel: true,
-                confirmText: 'Ya, Lanjutkan',
+                confirmText: 'Ya',
                 cancelText: 'Batal',
-                onConfirm: function() {
+                onConfirm: function () {
                     form.dataset.sudahKonfirmasi = '1'; // cegah submit ganda
                     form.submit();
                 }

@@ -3,29 +3,6 @@
 @section('content')
     <div class="space-y-6">
 
-        {{-- CSS Khusus Mode Cetak --}}
-        <style>
-            @media print {
-
-                aside,
-                header,
-                nav,
-                .no-print {
-                    display: none !important;
-                }
-
-                body {
-                    background-color: white !important;
-                }
-
-                .print-area {
-                    border: none !important;
-                    box-shadow: none !important;
-                    padding: 0 !important;
-                }
-            }
-        </style>
-
         {{-- Title Header --}}
         <div class="bg-white p-5 rounded-xl border border-slate-200 no-print">
             <h2 class="text-xl font-bold text-slate-800">Cetak & Unduh Laporan Peminjaman</h2>
@@ -71,15 +48,14 @@
                         </a>
                     </div>
                 @endif
-
-                {{-- Tombol Print / PDF --}}
-                <div>
-                    <button type="button" onclick="window.print()"
-                        class="w-full py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition flex items-center justify-center space-x-2 shadow-sm">
-                        <i class="fa-solid fa-print"></i>
-                        <span>Cetak / PDF</span>
-                    </button>
-                </div>
+            {{-- Tombol Print / PDF --}}
+            <div>
+                <a href="{{ url('/petugas/laporan/pdf?' . http_build_query(request()->all())) }}" target="_blank"
+                    class="w-full py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition flex items-center justify-center space-x-2 shadow-sm">
+                    <i class="fa-solid fa-print"></i>
+                    <span>Cetak / PDF</span>
+                </a>
+            </div>
 
                 {{-- Tombol Download Excel --}}
                 <div>
@@ -176,14 +152,6 @@
             {{-- AREA PAGINATION (10 Data Per Halaman) --}}
             <div class="pt-4 no-print">
                 {{ $laporan->links() }}
-            </div>
-
-            {{-- Kolom Tanda Tangan (Muncul hanya saat Print) --}}
-            <div class="hidden print:flex justify-end pt-8">
-                <div class="text-center text-xs space-y-12">
-                    <p>Petugas Penanggung Jawab,</p>
-                    <p class="font-bold underline text-slate-800">( {{ auth()->user()->username ?? 'Nama Petugas' }} )</p>
-                </div>
             </div>
 
         </div>
